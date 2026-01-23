@@ -1,0 +1,199 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem 0;
+    z-index: 1000;
+    transition: all 0.4s ease;
+    background: transparent;
+}
+
+.navbar.scrolled {
+    background: #fff;
+    /* Soft Black with opacity */
+    backdrop-filter: blur(10px);
+    padding: 1rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* Space between logo and text */
+}
+
+.brand-text {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-cream);
+    letter-spacing: -0.5px;
+    transition: color 0.3s ease;
+}
+
+.scrolled .brand-text {
+    color: var(--color-text-dark);
+}
+
+.brand-logo {
+    height: 80px;
+    /* Adjust as needed */
+    width: 80px;
+    transition: transform 0.3s ease;
+}
+
+.scrolled .brand-logo {
+    transform: scale(0.9);
+}
+
+.scrolled .navbar-brand {
+    color: var(--color-accent-gold);
+    gap: 5px;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-link {
+    font-family: var(--font-subheading);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-cream);
+    position: relative;
+    letter-spacing: 0.5px;
+}
+
+.scrolled .nav-link {
+    color: var(--color-text-dark);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: var(--color-accent-gold);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+.nav-link:hover {
+    color: var(--color-accent-gold);
+}
+
+.scrolled .nav-link:hover {
+    color: var(--color-accent-gold);
+}
+
+/* Button override for navbar */
+.navbar .btn-primary {
+    padding: 10px 24px;
+    font-size: 0.9rem;
+}
+
+.mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.mobile-toggle span {
+    width: 25px;
+    height: 2px;
+    background-color: var(--color-accent-gold);
+    transition: 0.3s;
+}
+
+.scrolled .mobile-toggle span {
+    background-color: var(--color-cream);
+}
+
+@media (max-width: 768px) {
+
+    .navbar-links,
+    .navbar-actions {
+        display: none;
+    }
+
+    .mobile-toggle {
+        display: flex;
+        z-index: 1001;
+        /* Ensure above the menu */
+    }
+
+    /* Mobile Menu Styles */
+    .navbar-links.active {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        /* or absolute depending on need, fixed covers screen better */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: #fff;
+        /* or var(--color-bg-dark) depending on theme */
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .navbar-actions.active {
+        display: block;
+        /* Show button */
+        position: fixed;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+    }
+
+    /* Mobile Toggle Animation (Simple Hamburger to X) */
+    .mobile-toggle.open span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+    }
+
+    .mobile-toggle.open span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-toggle.open span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+    }
+
+    /* Ensure links are dark on white mobile menu */
+    .navbar-links.active .nav-link {
+        color: var(--color-text-dark);
+        /* Assuming this variable exists, checking context */
+        font-size: 1.5rem;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+}

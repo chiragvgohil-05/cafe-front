@@ -1,0 +1,29 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+    <div class="container navbar-container">
+        <a routerLink="/" class="navbar-brand">
+            <img [src]="isScrolled ? 'logo_scroll.png' : 'logo.png'"
+                [alt]="isScrolled ? 'CafeEro Scrolled Logo' : 'CafeEro Logo'" class="brand-logo">
+            <span class="brand-text">SnowEra</span>
+        </a>
+
+        <div class="navbar-links" [class.active]="isMenuOpen">
+            <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                (click)="closeMenu()">Home</a>
+            <a routerLink="/menu" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Menu</a>
+            <a routerLink="/about" class="nav-link" routerLinkActive="active" (click)="closeMenu()">About</a>
+            <a routerLink="/reservation" class="nav-link" routerLinkActive="active"
+                (click)="closeMenu()">Reservation</a>
+        </div>
+
+        <div class="navbar-actions" [class.active]="isMenuOpen">
+            <button class="btn-primary" (click)="onBookTable()">Book a Table</button>
+        </div>
+
+        <!-- Mobile Menu Toggle (Placeholder) -->
+        <div class="mobile-toggle" (click)="toggleMenu()" [class.open]="isMenuOpen">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>

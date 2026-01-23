@@ -1,0 +1,42 @@
+<section class="menu-page">
+    <!-- Menu Header -->
+    <div class="menu-hero text-center"
+        style="background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
+        <div class="overlay"></div>
+        <div class="content relative z-10">
+            <h1 class="text-white">Our Menu</h1>
+            <p class="text-gold subtitle">Handcrafted. Fresh. Delicious.</p>
+        </div>
+    </div>
+
+    <div class="container main-content">
+        <!-- Filters -->
+        <div class="menu-filters">
+            <button *ngFor="let cat of categories" class="filter-btn" [class.active]="currentCategory === cat"
+                (click)="setCategory(cat)">
+                {{ cat }}
+            </button>
+        </div>
+
+        <!-- Regular Menu Grid -->
+        <div class="menu-grid">
+            <div class="menu-card fade-in" *ngFor="let item of filteredItems">
+                <div class="card-img" [style.background-image]="'url(' + item.image + ')'">
+                    <div class="rating-badge">
+                        <span class="star">★</span> {{ item.rating }}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3>{{ item.name }}</h3>
+                    </div>
+                    <p class="card-desc">{{ item.description }}</p>
+                    <div class="price-row">
+                        <span class="price">${{ item.price | number:'1.2-2' }}</span>
+                        <button class="btn-icon">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

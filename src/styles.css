@@ -1,0 +1,149 @@
+/* CafeEro Global Styles - Modern Minimal Luxury */
+
+:root {
+    /* Color Palette */
+    --color-coffee-brown: #4E342E;
+    --color-cream: #F5EFE6;
+    --color-accent-gold: #C9A24D;
+    --color-soft-black: #1C1C1C;
+    --color-white: #FFFFFF;
+    --color-gray-light: #F8F9FA;
+    --color-text-dark: #1C1C1C;
+    --color-text-muted: #6c757d;
+
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-subheading: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 4rem;
+    --spacing-xl: 6rem;
+
+    /* Shadows */
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.1);
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition-base: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
+    background-color: var(--color-cream);
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    color: var(--color-coffee-brown);
+    margin-top: 0;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+h3 {
+    font-size: 1.75rem;
+    font-family: var(--font-subheading);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--transition-base);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* UI Components */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section {
+    padding: var(--spacing-xl) 0;
+}
+
+.btn-primary {
+    background-color: var(--color-coffee-brown);
+    color: var(--color-white);
+    padding: 14px 28px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-coffee-brown);
+    font-family: var(--font-subheading);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    background-color: transparent;
+    color: var(--color-coffee-brown);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--color-coffee-brown);
+    padding: 14px 28px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-coffee-brown);
+    font-family: var(--font-subheading);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+    display: inline-block;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-coffee-brown);
+    color: var(--color-white);
+    transform: translateY(-2px);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-gold {
+    color: var(--color-accent-gold);
+}
+
+.text-cream {
+    color: var(--color-cream);
+}
