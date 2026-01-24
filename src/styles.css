@@ -113,8 +113,8 @@ ul {
 
 .btn-primary:hover {
     background-color: transparent;
-    color: var(--color-coffee-brown);
-    transform: translateY(-2px);
+    color: var(--color-accent-gold);
+    border: 2px solid var(--color-accent-gold);
 }
 
 .btn-secondary {
@@ -133,7 +133,6 @@ ul {
 .btn-secondary:hover {
     background-color: var(--color-coffee-brown);
     color: var(--color-white);
-    transform: translateY(-2px);
 }
 
 .text-center {
