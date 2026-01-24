@@ -1,0 +1,69 @@
+<div class="tables-container">
+    <div class="page-header">
+        <div class="header-left">
+             <h1>Tables</h1>
+             <p class="subtitle">Manage table availability and reservations</p>
+        </div>
+        <div class="header-right">
+             <div class="search-bar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Search tables...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-box" *ngFor="let stat of tableStats">
+            <span class="stat-label">{{ stat.label }}</span>
+            <div class="stat-value" [ngClass]="stat.color">{{ stat.value }}</div>
+        </div>
+    </div>
+
+    <!-- Filter indicators (Legend) -->
+    <div class="legend">
+        <div class="legend-item"><span class="dot available"></span> Available</div>
+        <div class="legend-item"><span class="dot occupied"></span> Occupied</div>
+        <div class="legend-item"><span class="dot reserved"></span> Reserved</div>
+        <div class="legend-item"><span class="dot cleaning"></span> Cleaning</div>
+    </div>
+
+    <!-- Tables Grid -->
+    <div class="tables-grid">
+        <div class="table-card" *ngFor="let table of filteredTables" [ngClass]="getCardClass(table.status)">
+            <div class="card-top">
+                <div class="table-id" [ngClass]="getStatusClass(table.status)">• {{ table.id }}</div>
+                <div class="more-options">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                </div>
+            </div>
+            
+            <div class="card-content">
+                <div class="seats-info">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
+                   <span>{{ table.seats }} seats</span>
+                </div>
+                
+                <div class="status-label" [ngClass]="getStatusClass(table.status)">
+                    {{ table.status }}
+                </div>
+
+                <div class="customer-info" *ngIf="table.status !== 'Available' && table.status !== 'Cleaning'">
+                    <div class="c-name">{{ table.customer }}</div>
+                    <div class="c-time" *ngIf="table.time">{{ table.time }}</div>
+                </div>
+                
+                <div class="empty-spacer" *ngIf="table.status === 'Available' || table.status === 'Cleaning'"></div>
+            </div>
+
+            <div class="card-actions">
+                <button class="btn-action" *ngIf="table.status === 'Available' || table.status === 'Cleaning'">Assign</button>
+                <button class="btn-action outline" *ngIf="table.status === 'Occupied'">Free Up</button>
+                <button class="btn-action outline" *ngIf="table.status === 'Reserved'">Check In</button>
+            </div>
+        </div>
+    </div>
+</div>

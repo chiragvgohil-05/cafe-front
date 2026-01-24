@@ -23,5 +23,32 @@ export const routes: Routes = [
         loadComponent: () => import('./features/reservation/reservation.component').then(m => m.Reservation)
       }
     ]
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./core/layout/admin-layout/admin-layout.component').then(m => m.AdminLayout),
+    children: [
+        {
+            path: '',
+            redirectTo: 'dashboard',
+            pathMatch: 'full'
+        },
+        {
+            path: 'dashboard',
+            loadComponent: () => import('./features/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        },
+        {
+            path: 'products',
+            loadComponent: () => import('./features/admin/products/products.component').then(m => m.ProductsComponent)
+        },
+        {
+            path: 'orders',
+            loadComponent: () => import('./features/admin/orders/orders.component').then(m => m.OrdersComponent)
+        },
+        {
+            path: 'tables',
+            loadComponent: () => import('./features/admin/tables/tables.component').then(m => m.TablesComponent)
+        }
+    ]
   }
 ];

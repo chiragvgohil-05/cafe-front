@@ -1,0 +1,88 @@
+<div class="orders-container">
+    <div class="page-header">
+        <h1>Orders</h1>
+        <p class="subtitle">Track and manage all orders</p>
+    </div>
+
+    <!-- Order Stats -->
+    <div class="stats-row">
+        <div class="stat-box" *ngFor="let stat of orderStats">
+            <span class="stat-label">{{ stat.label }}</span>
+            <div class="stat-value" [ngClass]="stat.color">{{ stat.value }}</div>
+        </div>
+    </div>
+
+    <!-- Filters & Actions -->
+    <div class="filters-bar">
+         <div class="search-bar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <input type="text" [(ngModel)]="searchTerm" placeholder="Search by order ID or customer...">
+        </div>
+
+        <div class="status-filter">
+            <select [(ngModel)]="selectedStatus">
+                <option value="All Status">All Status</option>
+                <option value="Completed">Completed</option>
+                <option value="Preparing">Preparing</option>
+                <option value="Pending">Pending</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Table</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of filteredOrders">
+                    <td class="font-bold text-brown">
+                        {{ order.id }}
+                    </td>
+                    <td>
+                        <div class="customer-cell">
+                             <div class="avatar-sm">
+                                {{ order.customer.split(' ')[0][0] }}{{ order.customer.split(' ')[1][0] }}
+                            </div>
+                            <span>{{ order.customer }}</span>
+                        </div>
+                    </td>
+                    <td class="text-muted">{{ order.items }}</td>
+                    <td>
+                        <span class="table-badge">{{ order.table }}</span>
+                    </td>
+                    <td class="font-bold">{{ order.total }}</td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                            <span class="dot" *ngIf="order.status === 'Completed'">✓</span>
+                            <span class="dot" *ngIf="order.status === 'Preparing'">⟳</span>
+                            <span class="dot" *ngIf="order.status === 'Pending'">!</span>
+                            <span class="dot" *ngIf="order.status === 'Cancelled'">✕</span>
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td class="text-muted text-sm">{{ order.time }}</td>
+                    <td>
+                        <button class="action-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
