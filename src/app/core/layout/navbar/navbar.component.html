@@ -13,6 +13,15 @@
             <a routerLink="/about" class="nav-link" routerLinkActive="active" (click)="closeMenu()">About</a>
             <a routerLink="/reservation" class="nav-link" routerLinkActive="active"
                 (click)="closeMenu()">Reservation</a>
+            <ng-container *ngIf="!authService.isLoggedIn()">
+                <a routerLink="/login" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Login</a>
+                <a routerLink="/register" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Register</a>
+            </ng-container>
+            <ng-container *ngIf="authService.isLoggedIn()">
+                <a *ngIf="authService.getRole() === 'admin'" routerLink="/admin" class="nav-link"
+                    routerLinkActive="active" (click)="closeMenu()">Admin</a>
+                <a (click)="logout(); closeMenu()" class="nav-link" style="cursor: pointer;">Logout</a>
+            </ng-container>
         </div>
 
         <div class="navbar-actions" [class.active]="isMenuOpen">

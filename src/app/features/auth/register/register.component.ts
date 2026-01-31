@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     selector: 'app-register',
@@ -17,8 +18,12 @@ export class RegisterComponent {
     confirmPassword: string = '';
     showPassword: boolean = false;
     showConfirmPassword: boolean = false;
+    loading: boolean = false;
 
-    constructor(private router: Router) { }
+    constructor(
+        private router: Router,
+        private authService: AuthService
+    ) { }
 
     togglePasswordVisibility() {
         this.showPassword = !this.showPassword;
@@ -29,22 +34,31 @@ export class RegisterComponent {
     }
 
     onSubmit() {
-        // TODO: Implement actual registration logic
-        if (this.password !== this.confirmPassword) {
-            alert('Passwords do not match!');
+        if (!this.fullName || !this.email || !this.password || !this.confirmPassword) {
             return;
         }
 
-        console.log('Registration attempt:', {
-            fullName: this.fullName,
-            email: this.email,
-            password: this.password
-        });
-
-        // For now, navigate to login after successful registration
-        if (this.fullName && this.email && this.password) {
-            alert('Registration successful! Please login.');
-            this.router.navigate(['/login']);
+        if (this.password !== this.confirmPassword) {
+            return;
         }
+
+        this.loading = true;
+        this.authService.register({
+            name: this.fullName,
+            email: this.email,
+            password: this.password,
+            role: 'customer' // Default role
+        }).subscribe({
+            next: (response) => {
+                this.loading = false;
+                if (response.success) {
+                    this.router.navigate(['/login']);
+                }
+            },
+            error: (error) => {
+                this.loading = false;
+                console.error('Registration error:', error);
+            }
+        });
     }
 }

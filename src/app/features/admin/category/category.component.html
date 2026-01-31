@@ -1,0 +1,135 @@
+<div class="categories-container">
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Menu Categories</h1>
+            <p class="subtitle">Organize your menu items into categories</p>
+        </div>
+        <div class="header-right">
+            <div class="search-bar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                        stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Search categories...">
+            </div>
+            <button class="btn-primary" (click)="openAddModal()">
+                + Add Category
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let cat of filteredCategories">
+                    <td>
+                        <span class="category-name">{{ cat.name }}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(cat.isActive)">
+                            {{ getStatusText(cat.isActive) }}
+                        </span>
+                    </td>
+                    <td>{{ cat.createdAt | date:'mediumDate' }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit" (click)="openEditModal(cat)" title="Edit">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" (click)="openDeleteModal(cat)" title="Delete">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="filteredCategories.length === 0">
+                    <td colspan="4" class="empty-state">No categories found</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Category Modal -->
+    <div class="modal-overlay" *ngIf="showCategoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>{{ isEditMode ? 'Edit Category' : 'Add New Category' }}</h2>
+                <button class="close-btn" (click)="showCategoryModal = false">&times;</button>
+            </div>
+            <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Category Name</label>
+                        <input type="text" formControlName="name" placeholder="Enter category name">
+                        <div class="error"
+                            *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.invalid">
+                            Category name is required
+                        </div>
+                    </div>
+                    <div class="form-group checkbox">
+                        <label class="switch">
+                            <input type="checkbox" formControlName="isActive">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="label-text">Active (Visible on menu)</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="showCategoryModal = false">Cancel</button>
+                    <button type="submit" class="btn-primary" [disabled]="categoryForm.invalid || isSubmitting">
+                        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Save Changes' : 'Create Category' }}</span>
+                        <span *ngIf="isSubmitting" class="loading-content">
+                            <div class="button-loader"></div>
+                            Processing...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" *ngIf="showDeleteModal">
+        <div class="modal-confirm">
+            <div class="confirm-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <h2>Delete Category?</h2>
+            <p>Are you sure you want to delete <strong>{{ selectedCategory?.name }}</strong>? This will fail if there
+                are products in this category.</p>
+            <div class="confirm-actions">
+                <button class="btn-secondary" (click)="showDeleteModal = false">No, Keep it</button>
+                <button class="btn-danger" (click)="confirmDelete()">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>

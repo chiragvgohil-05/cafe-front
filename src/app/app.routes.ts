@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './core/layout/main-layout/main-layout.component';
+import { authGuard, adminGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
+    canActivate: [authGuard],
     component: MainLayout,
     children: [
       {
@@ -26,6 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    canActivate: [adminGuard],
     loadComponent: () => import('./core/layout/admin-layout/admin-layout.component').then(m => m.AdminLayout),
     children: [
       {
@@ -40,6 +43,10 @@ export const routes: Routes = [
       {
         path: 'products',
         loadComponent: () => import('./features/admin/products/products.component').then(m => m.ProductsComponent)
+      },
+      {
+        path: 'categories',
+        loadComponent: () => import('./features/admin/category/category.component').then(m => m.CategoryComponent)
       },
       {
         path: 'orders',

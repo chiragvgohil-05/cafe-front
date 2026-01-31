@@ -2,20 +2,32 @@
     <div class="page-header">
         <div class="header-left">
             <h1>Products</h1>
-            <p class="subtitle">Manage your cafe menu items</p>
+            <p class="subtitle">Manage your cafe menu items and their availability</p>
         </div>
         <div class="header-right">
-             <div class="search-bar">
+            <div class="search-bar">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                        d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                        stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
                 </svg>
                 <input type="text" [(ngModel)]="searchTerm" placeholder="Search products...">
             </div>
-            <button class="btn-primary">
-                + Add Product
+            <button class="btn-primary" (click)="openAddModal()">
+                <span class="btn-icon">+</span> Add Product
             </button>
         </div>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <div class="category-tabs">
+        <button [class.active]="currentCategory === 'All'" (click)="setCategory('All')">All Items</button>
+        <button *ngFor="let cat of categories" [class.active]="currentCategory === cat._id"
+            (click)="setCategory(cat._id)">
+            {{ cat.name }}
+        </button>
     </div>
 
     <div class="table-container">
@@ -25,7 +37,6 @@
                     <th>Product</th>
                     <th>Category</th>
                     <th>Price</th>
-                    <th>Stock</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -34,26 +45,220 @@
                 <tr *ngFor="let product of filteredProducts">
                     <td class="product-cell">
                         <div class="product-icon">
-                            <!-- Placeholder icon -->
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                            <img *ngIf="product.image" [src]="product.image" [alt]="product.name"
+                                class="img-preview-small">
+                            <div *ngIf="!product.image" class="placeholder-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                                    <line x1="6" y1="1" x2="6" y2="4"></line>
+                                    <line x1="10" y1="1" x2="10" y2="4"></line>
+                                    <line x1="14" y1="1" x2="14" y2="4"></line>
+                                </svg>
+                            </div>
                         </div>
-                        <span class="product-name">{{ product.name }}</span>
+                        <div class="product-info">
+                            <span class="product-name">{{ product.name }}</span>
+                            <span class="product-desc" *ngIf="product.description">{{ product.description | slice:0:30
+                                }}...</span>
+                        </div>
                     </td>
-                    <td>{{ product.category }}</td>
-                    <td class="font-bold">{{ product.price }}</td>
-                    <td>{{ product.stock }}</td>
                     <td>
-                        <span class="status-badge" [ngClass]="getStatusClass(product.status)">
-                            {{ product.status }}
+                        <span class="cat-badge">{{ product.categoryName }}</span>
+                    </td>
+                    <td class="font-bold">${{ product.price.toFixed(2) }}</td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(product.isAvailable)">
+                            {{ getStatusText(product.isAvailable) }}
                         </span>
                     </td>
                     <td>
-                        <button class="action-btn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                        </button>
+                        <div class="action-buttons">
+                            <button class="action-btn edit" (click)="openEditModal(product)" title="Edit Product">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" (click)="openDeleteModal(product)" title="Delete Product">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="filteredProducts.length === 0">
+                    <td colspan="5" class="empty-state">
+                        <div class="empty-content">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                            <p>No products found in this category.</p>
+                        </div>
                     </td>
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Product Modal (Add/Edit) -->
+    <div class="modal-overlay" *ngIf="showProductModal" (click)="showProductModal = false">
+        <div class="modal-content premium" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>{{ isEditMode ? 'Modify Product' : 'Add New Product' }}</h2>
+                <button class="close-btn" (click)="showProductModal = false">
+                    <svg width="20" height="20" viewBox="0 0 15 15" version="1.1" id="cross"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M2.64,1.27L7.5,6.13l4.84-4.84C12.5114,1.1076,12.7497,1.0029,13,1c0.5523,0,1,0.4477,1,1&#xA;&#x9;c0.0047,0.2478-0.093,0.4866-0.27,0.66L8.84,7.5l4.89,4.89c0.1648,0.1612,0.2615,0.3796,0.27,0.61c0,0.5523-0.4477,1-1,1&#xA;&#x9;c-0.2577,0.0107-0.508-0.0873-0.69-0.27L7.5,8.87l-4.85,4.85C2.4793,13.8963,2.2453,13.9971,2,14c-0.5523,0-1-0.4477-1-1&#xA;&#x9;c-0.0047-0.2478,0.093-0.4866,0.27-0.66L6.16,7.5L1.27,2.61C1.1052,2.4488,1.0085,2.2304,1,2c0-0.5523,0.4477-1,1-1&#xA;&#x9;C2.2404,1.0029,2.4701,1.0998,2.64,1.27z" />
+                    </svg>
+                </button>
+            </div>
+            <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <section class="form-left">
+                            <div class="form-group">
+                                <label>Image Preview</label>
+                                <div class="image-upload-area" (click)="fileInput.click()">
+                                    <input type="file" (change)="onFileSelected($event)" accept="image/*" #fileInput
+                                        hidden>
+                                    <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview">
+                                    <div *ngIf="!imagePreview" class="upload-placeholder">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                        </svg>
+                                        <span>Select Image</span>
+                                    </div>
+                                    <div class="upload-overlay" *ngIf="imagePreview">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="form-right">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" formControlName="name" placeholder="e.g. Classic Cappuccino">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Category</label>
+                                <div class="category-grid-selector">
+                                    <button type="button" *ngFor="let cat of categories" class="category-option-card"
+                                        [class.selected]="productForm.get('categoryId')?.value === cat._id"
+                                        (click)="productForm.get('categoryId')?.setValue(cat._id)">
+                                        <span class="cat-name">{{ cat.name }}</span>
+                                        <div class="selection-indicator">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="4">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        </div>
+                                    </button>
+                                </div>
+                                <input type="hidden" formControlName="categoryId">
+                            </div>
+                            <div class="form-group">
+                                <label>Price ($)</label>
+                                <input type="number" formControlName="price" placeholder="0.00" step="0.01">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea formControlName="description" rows="3"
+                                    placeholder="Describe this delicious item..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Visibility & Stock</label>
+                                <div class="premium-toggle-bar"
+                                    [class.is-active]="productForm.get('isAvailable')?.value"
+                                    (click)="productForm.get('isAvailable')?.setValue(!productForm.get('isAvailable')?.value)">
+                                    <div class="toggle-label-group">
+                                        <span class="main-label">Available for Order</span>
+                                        <span class="sub-label">{{ productForm.get('isAvailable')?.value ? 'Visible to
+                                            customers' : 'Hidden from menu' }}</span>
+                                    </div>
+                                    <div class="premium-switch-wrapper">
+                                        <div class="switch-track">
+                                            <div class="switch-handle">
+                                                <svg *ngIf="productForm.get('isAvailable')?.value" width="10"
+                                                    height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="4">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" formControlName="isAvailable" hidden>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="modal-footer-fancy">
+                    <button type="button" class="btn-cancel-fancy" (click)="showProductModal = false">
+                        Discard
+                    </button>
+                    <button type="submit" class="btn-submit-fancy" [disabled]="productForm.invalid || isSubmitting">
+                        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Save Changes' : 'Create Product' }}</span>
+                        <span *ngIf="isSubmitting">Processing...</span>
+
+                        <!-- Arrow Icon (Shown when not loading) -->
+                        <svg *ngIf="!isSubmitting" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+
+                        <!-- Spinner Icon (Shown when loading) -->
+                        <div *ngIf="isSubmitting" class="button-loader"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay danger" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+        <div class="modal-confirm" (click)="$event.stopPropagation()">
+            <div class="danger-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF4D4D" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <h3>Delete Product</h3>
+            <p>Are you sure you want to remove <strong>"{{ selectedProduct?.name }}"</strong>? This action is permanent.
+            </p>
+            <div class="confirm-footer">
+                <button class="btn-ghost" (click)="showDeleteModal = false">Keep Product</button>
+                <button class="btn-danger-premium" (click)="confirmDelete()">Delete Item</button>
+            </div>
+        </div>
     </div>
 </div>
