@@ -1,0 +1,118 @@
+<div class="auth-container">
+    <div class="auth-card register-card">
+        <div class="auth-header">
+            <h1 class="welcome-text">Create Account</h1>
+            <p class="auth-subtitle">Join us and start your coffee journey.</p>
+        </div>
+
+        <div class="separator-line top"></div>
+
+        <form (ngSubmit)="regForm.form.valid && onSubmit()" #regForm="ngForm" class="auth-form" novalidate>
+            <!-- Full Name Input -->
+            <div class="input-group"
+                [class.input-error]="nameInput.invalid && (nameInput.dirty || nameInput.touched || regForm.submitted)">
+                <div class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </div>
+                <div class="input-wrapper">
+                    <div class="label-row">
+                        <label for="fullName">Full Name</label>
+                    </div>
+                    <input type="text" id="fullName" name="fullName" [(ngModel)]="fullName" #nameInput="ngModel"
+                        placeholder="Enter your full name" required />
+                </div>
+            </div>
+            <span class="error-text"
+                *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched || regForm.submitted)">
+                Full name is required
+            </span>
+
+            <!-- Email Input -->
+            <div class="input-group"
+                [class.input-error]="emailInput.invalid && (emailInput.dirty || emailInput.touched || regForm.submitted)">
+                <div class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                </div>
+                <div class="input-wrapper">
+                    <div class="label-row">
+                        <label for="email">Email</label>
+                    </div>
+                    <input type="email" id="email" name="email" [(ngModel)]="email" #emailInput="ngModel"
+                        placeholder="Enter your email" required email />
+                </div>
+            </div>
+            <span class="error-text"
+                *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched || regForm.submitted)">
+                Please enter a valid email
+            </span>
+
+            <!-- Password Input -->
+            <div class="input-group"
+                [class.input-error]="passInput.invalid && (passInput.dirty || passInput.touched || regForm.submitted)">
+                <div class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
+                </div>
+                <div class="input-wrapper">
+                    <div class="label-row">
+                        <label for="password">Password</label>
+                    </div>
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                        [(ngModel)]="password" #passInput="ngModel" placeholder="Create a password" required
+                        minlength="6" />
+                </div>
+            </div>
+            <span class="error-text"
+                *ngIf="passInput.invalid && (passInput.dirty || passInput.touched || regForm.submitted)">
+                Password must be at least 6 characters
+            </span>
+
+            <!-- Confirm Password Input -->
+            <div class="input-group"
+                [class.input-error]="confirmInput.invalid && (confirmInput.dirty || confirmInput.touched || regForm.submitted)">
+                <div class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
+                </div>
+                <div class="input-wrapper">
+                    <div class="label-row">
+                        <label for="confirmPassword">Confirm Password</label>
+                    </div>
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
+                        name="confirmPassword" [(ngModel)]="confirmPassword" #confirmInput="ngModel"
+                        placeholder="Confirm your password" required />
+                </div>
+            </div>
+            <span class="error-text"
+                *ngIf="(confirmInput.invalid || confirmPassword !== password) && (confirmInput.dirty || confirmInput.touched || regForm.submitted)">
+                <span *ngIf="confirmInput.errors?.['required']">Confirmation is required</span>
+                <span *ngIf="confirmPassword !== password && !confirmInput.errors?.['required']">Passwords do not
+                    match</span>
+            </span>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-login">Create Account</button>
+        </form>
+
+        <div class="separator-line bottom"></div>
+
+        <!-- Login Link -->
+        <p class="auth-footer">
+            Already have an account? <a routerLink="/login" class="link-accent">Log In</a>
+        </p>
+    </div>
+</div>

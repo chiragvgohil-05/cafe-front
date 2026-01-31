@@ -28,27 +28,35 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () => import('./core/layout/admin-layout/admin-layout.component').then(m => m.AdminLayout),
     children: [
-        {
-            path: '',
-            redirectTo: 'dashboard',
-            pathMatch: 'full'
-        },
-        {
-            path: 'dashboard',
-            loadComponent: () => import('./features/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
-        },
-        {
-            path: 'products',
-            loadComponent: () => import('./features/admin/products/products.component').then(m => m.ProductsComponent)
-        },
-        {
-            path: 'orders',
-            loadComponent: () => import('./features/admin/orders/orders.component').then(m => m.OrdersComponent)
-        },
-        {
-            path: 'tables',
-            loadComponent: () => import('./features/admin/tables/tables.component').then(m => m.TablesComponent)
-        }
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'products',
+        loadComponent: () => import('./features/admin/products/products.component').then(m => m.ProductsComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./features/admin/orders/orders.component').then(m => m.OrdersComponent)
+      },
+      {
+        path: 'tables',
+        loadComponent: () => import('./features/admin/tables/tables.component').then(m => m.TablesComponent)
+      }
     ]
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
   }
 ];

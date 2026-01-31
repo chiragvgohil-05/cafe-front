@@ -1,0 +1,71 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="welcome-text">Welcome Back</h1>
+            <p class="auth-subtitle">Please sign in to your account.</p>
+        </div>
+
+        <div class="separator-line top"></div>
+
+        <form (ngSubmit)="loginForm.form.valid && onSubmit()" #loginForm="ngForm" class="auth-form" novalidate>
+            <!-- Email Input -->
+            <div class="input-group"
+                [class.input-error]="emailInput.invalid && (emailInput.dirty || emailInput.touched || loginForm.submitted)">
+                <div class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+                    </svg>
+                </div>
+                <div class="input-wrapper">
+                    <div class="label-row">
+                        <label for="email">Email</label>
+                    </div>
+                    <input type="email" id="email" name="email" [(ngModel)]="email" #emailInput="ngModel"
+                        placeholder="Enter your email" required email />
+                </div>
+            </div>
+            <span class="error-text"
+                *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched || loginForm.submitted)">
+                <span *ngIf="emailInput.errors?.['required']">Email is required</span>
+                <span *ngIf="emailInput.errors?.['email']">Please enter a valid email</span>
+            </span>
+
+            <!-- Password Input -->
+            <div class="input-group"
+                [class.input-error]="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched || loginForm.submitted)">
+                <div class="input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
+                </div>
+                <div class="input-wrapper">
+                    <div class="label-row">
+                        <label for="password">Password</label>
+                    </div>
+                    <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                        [(ngModel)]="password" #passwordInput="ngModel" placeholder="Enter your password" required
+                        minlength="6" />
+                </div>
+            </div>
+            <span class="error-text"
+                *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched || loginForm.submitted)">
+                <span *ngIf="passwordInput.errors?.['required']">Password is required</span>
+                <span *ngIf="passwordInput.errors?.['minlength']">Password must be at least 6 characters</span>
+            </span>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-login">Log In</button>
+        </form>
+
+        <div class="separator-line bottom"></div>
+
+        <!-- Sign Up Link -->
+        <p class="auth-footer">
+            Don't have an account? <a routerLink="/register" class="link-accent">Sign Up</a>
+        </p>
+    </div>
+</div>
