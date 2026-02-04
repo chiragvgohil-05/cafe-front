@@ -1,7 +1,25 @@
 .admin-container {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
+    /* change from min-height */
+    overflow: hidden;
+    /* prevents global scroll */
     background-color: var(--color-gray-light);
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.page-content {
+    flex-grow: 1;
+    padding: var(--spacing-md);
+    overflow-y: auto;
+    /* ✅ ONLY THIS SCROLLS */
 }
 
 /* Sidebar Styles */
@@ -41,7 +59,8 @@
 }
 
 .logo-text h3 {
-    color: class(--color-white); /* Error in variable usage? h3 color is usually brown, override here */
+    color: class(--color-white);
+    /* Error in variable usage? h3 color is usually brown, override here */
     color: var(--color-white);
     margin: 0;
     font-size: 1.25rem;
@@ -125,7 +144,7 @@
 .top-header {
     height: 80px;
     background-color: var(--color-white);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
