@@ -157,7 +157,7 @@
 
 .table-header {
     display: grid;
-    grid-template-columns: 80px 1.5fr 1fr 1.2fr 100px 120px 120px;
+    grid-template-columns: 80px 1.5fr 1fr 1.2fr 100px 120px 100px 120px;
     background: linear-gradient(135deg, var(--color-coffee-brown) 0%, #3e2723 100%);
     color: white;
     padding: 16px 20px;
@@ -179,7 +179,7 @@
 
 .table-row {
     display: grid;
-    grid-template-columns: 80px 1.5fr 1fr 1.2fr 100px 120px 120px;
+    grid-template-columns: 80px 1.5fr 1fr 1.2fr 100px 120px 100px 120px;
     padding: 16px 20px;
     border-bottom: 1px solid #f0f0f0;
     transition: background 0.2s;
@@ -270,6 +270,30 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.payment-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.payment-paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.payment-unpaid {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.payment-failed {
+    background: #f8d7da;
+    color: #721c24;
 }
 
 .status-pending {
@@ -379,7 +403,7 @@
 
     .table-header,
     .table-row {
-        grid-template-columns: 80px 1.5fr 1fr 1fr 80px 100px 100px;
+        grid-template-columns: 80px 1.5fr 1fr 1fr 80px 100px 90px 90px;
     }
 }
 

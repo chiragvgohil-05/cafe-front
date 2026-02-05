@@ -25,6 +25,14 @@ export class ReservationService {
         return this.http.post(`${this.apiUrl}`, reservationData);
     }
 
+    createReservationPaymentOrder(reservationId: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/payment/create`, { reservationId });
+    }
+
+    verifyReservationPayment(payload: any): Observable<any> {
+        return this.http.post(`${this.apiUrl}/payment/verify`, payload);
+    }
+
     getMyReservations(email?: string, phone?: string): Observable<any[]> {
         let params = new HttpParams();
         if (email) params = params.set('email', email);

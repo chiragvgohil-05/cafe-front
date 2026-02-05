@@ -22,6 +22,9 @@ interface Reservation {
         specialRequest?: string;
     };
     status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+    paymentStatus?: 'unpaid' | 'paid' | 'failed';
+    securityAmount?: number;
+    paidAt?: string;
     createdAt: string;
 }
 
@@ -126,6 +129,10 @@ export class ReservationsComponent implements OnInit {
 
     getStatusClass(status: string): string {
         return `status-${status}`;
+    }
+
+    getPaymentClass(status?: string): string {
+        return status ? `payment-${status}` : 'payment-unpaid';
     }
 
     formatDate(dateString: string): string {

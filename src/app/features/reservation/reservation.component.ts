@@ -1,8 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ReservationService } from '../../core/services/reservation.service';
 import { Router, RouterModule } from '@angular/router';
+
+declare var Razorpay: any;
 
 interface Table {
   _id: string;
@@ -36,6 +38,7 @@ export class Reservation implements OnInit {
   private reservationService = inject(ReservationService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private platformId = inject(PLATFORM_ID);
 
   currentStep = 1;
   bookingForm: FormGroup;
@@ -47,6 +50,8 @@ export class Reservation implements OnInit {
   bookingId: string = '';
   loading = false;
   errorMessage = '';
+  securityDeposit = 100;
+  pendingReservationId: string | null = null;
 
   // Menu items from backend
   menuItems: MenuItem[] = [];
@@ -164,7 +169,13 @@ export class Reservation implements OnInit {
 
   confirmBooking() {
     this.loading = true;
+    this.errorMessage = '';
     const formData = this.bookingForm.value;
+
+    if (this.pendingReservationId) {
+      this.createPaymentOrder(this.pendingReservationId, formData);
+      return;
+    }
 
     const reservationData = {
       tableId: this.selectedTable?._id,
@@ -182,14 +193,128 @@ export class Reservation implements OnInit {
 
     this.reservationService.createReservation(reservationData).subscribe({
       next: (res) => {
-        this.bookingId = res.reservation._id;
-        this.loading = false;
-        this.currentStep = 5;
+        const reservation = res.reservation;
+        this.bookingId = reservation._id;
+        this.pendingReservationId = reservation._id;
+        if (reservation?.securityAmount) {
+          this.securityDeposit = reservation.securityAmount;
+        }
+        this.createPaymentOrder(reservation._id, formData);
       },
       error: (err) => {
         this.loading = false;
         this.errorMessage = err.error?.message || 'Booking failed. Please try again.';
       }
     });
+  }
+
+  private async createPaymentOrder(reservationId: string, formData: any) {
+    this.reservationService.createReservationPaymentOrder(reservationId).subscribe({
+      next: async (res) => {
+        try {
+          if (res?.data?.paymentStatus === 'paid') {
+            this.loading = false;
+            this.currentStep = 5;
+            this.pendingReservationId = null;
+            return;
+          }
+          if (!res?.data?.razorpayOrderId) {
+            this.loading = false;
+            this.errorMessage = 'Payment order not available. Please try again.';
+            return;
+          }
+          if (res?.data?.amount) {
+            this.securityDeposit = Math.round(res.data.amount / 100);
+          }
+          if (!this.isBrowser()) {
+            this.loading = false;
+            this.errorMessage = 'Payment can only be completed in a browser.';
+            return;
+          }
+          await this.loadRazorpayScript();
+          this.loading = false;
+          this.openRazorpayCheckout(res.data, reservationId, formData);
+        } catch (err) {
+          this.loading = false;
+          this.errorMessage = 'Failed to load payment gateway. Please try again.';
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.error?.message || 'Failed to initiate payment. Please try again.';
+      }
+    });
+  }
+
+  private loadRazorpayScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.isBrowser()) {
+        reject(new Error('Not in browser'));
+        return;
+      }
+      const existing = document.getElementById('razorpay-sdk');
+      if (existing) {
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.id = 'razorpay-sdk';
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Razorpay SDK failed to load'));
+      document.body.appendChild(script);
+    });
+  }
+
+  private openRazorpayCheckout(orderData: any, reservationId: string, formData: any) {
+    const options = {
+      key: orderData.keyId,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: 'CafeEro',
+      description: 'Reservation security deposit',
+      order_id: orderData.razorpayOrderId,
+      prefill: {
+        name: formData.name,
+        email: formData.email,
+        contact: formData.phone
+      },
+      theme: {
+        color: '#4E342E'
+      },
+      handler: (response: any) => {
+        this.verifyPayment(reservationId, response);
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', () => {
+      this.errorMessage = 'Payment failed. Please try again.';
+    });
+    rzp.open();
+  }
+
+  private verifyPayment(reservationId: string, response: any) {
+    this.loading = true;
+    this.reservationService.verifyReservationPayment({
+      reservationId,
+      razorpayOrderId: response.razorpay_order_id,
+      razorpayPaymentId: response.razorpay_payment_id,
+      razorpaySignature: response.razorpay_signature
+    }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.currentStep = 5;
+        this.pendingReservationId = null;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.error?.message || 'Payment verification failed.';
+      }
+    });
+  }
+
+  private isBrowser() {
+    return isPlatformBrowser(this.platformId);
   }
 }

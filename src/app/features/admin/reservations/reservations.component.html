@@ -60,6 +60,7 @@
             <div class="th th-datetime">Date & Time</div>
             <div class="th th-guests">Guests</div>
             <div class="th th-status">Status</div>
+            <div class="th th-payment">Payment</div>
             <div class="th th-actions">Actions</div>
         </div>
 
@@ -102,6 +103,11 @@
                 <div class="td td-status">
                     <span class="status-badge" [ngClass]="getStatusClass(reservation.status)">
                         {{ reservation.status | titlecase }}
+                    </span>
+                </div>
+                <div class="td td-payment">
+                    <span class="payment-badge" [ngClass]="getPaymentClass(reservation.paymentStatus)">
+                        {{ (reservation.paymentStatus || 'unpaid') | titlecase }}
                     </span>
                 </div>
                 <div class="td td-actions">
@@ -177,6 +183,15 @@
                             <span class="status-badge" [ngClass]="getStatusClass(selectedReservation.status)">
                                 {{ selectedReservation.status | titlecase }}
                             </span>
+                        </p>
+                        <p><strong>Payment:</strong>
+                            <span class="payment-badge"
+                                [ngClass]="getPaymentClass(selectedReservation.paymentStatus)">
+                                {{ (selectedReservation.paymentStatus || 'unpaid') | titlecase }}
+                            </span>
+                        </p>
+                        <p *ngIf="selectedReservation.securityAmount">
+                            <strong>Security Deposit:</strong> Rs {{ selectedReservation.securityAmount }}
                         </p>
                     </div>
                     <div class="detail-section full-width">

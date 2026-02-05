@@ -34,11 +34,14 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
 }
 
+.reservation-hero .content h1{
+    color: #fff !important;
+}
 .reservation-hero .content {
     position: relative;
     z-index: 2;
     text-align: center;
-    color: white;
+    color: white !important;
     transform: translateY(-20px);
 }
 
@@ -160,7 +163,7 @@ p.subtitle {
 input,
 select,
 textarea {
-    width: 100%;
+    width: -webkit-fill-available;
     padding: 14px 16px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -550,6 +553,10 @@ textarea {
     overflow: hidden;
 }
 
+.payment-card .confirm-header {
+    background: linear-gradient(135deg, #c89a3c 0%, #8f6b2b 100%);
+}
+
 .confirm-header {
     background: linear-gradient(135deg, var(--color-brown) 0%, var(--color-brown-dark) 100%);
     color: white;
@@ -676,6 +683,13 @@ textarea {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.payment-note {
+    margin: 14px 0 0 0;
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
 }
 
 /* Actions */
