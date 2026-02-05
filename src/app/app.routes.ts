@@ -23,6 +23,10 @@ export const routes: Routes = [
       {
         path: 'reservation',
         loadComponent: () => import('./features/reservation/reservation.component').then(m => m.Reservation)
+      },
+      {
+        path: 'my-reservations',
+        loadComponent: () => import('./features/reservation/my-reservations/my-reservations.component').then(m => m.MyReservationsComponent)
       }
     ]
   },
@@ -49,8 +53,8 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/category/category.component').then(m => m.CategoryComponent)
       },
       {
-        path: 'orders',
-        loadComponent: () => import('./features/admin/orders/orders.component').then(m => m.OrdersComponent)
+        path: 'reservations',
+        loadComponent: () => import('./features/admin/reservations/reservations.component').then(m => m.ReservationsComponent)
       },
       {
         path: 'tables',

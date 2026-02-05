@@ -1,0 +1,63 @@
+<div class="page-container">
+    <div class="content-wrapper">
+        <h2>My Reservations</h2>
+        <p class="subtitle">Enter your details to find your bookings.</p>
+
+        <div class="search-box">
+            <div class="input-group">
+                <input type="email" [(ngModel)]="email" placeholder="Email Address">
+            </div>
+            <span class="or">OR</span>
+            <div class="input-group">
+                <input type="tel" [(ngModel)]="phone" placeholder="Phone Number">
+            </div>
+            <button class="btn-search" (click)="findReservations()" [disabled]="loading">
+                {{ loading ? 'Searching...' : 'Find' }}
+            </button>
+        </div>
+
+        <div class="results-area" *ngIf="searched">
+            <div *ngIf="reservations.length === 0 && !loading" class="no-results">
+                <p>No reservations found with those details.</p>
+                <button routerLink="/reservation" class="btn-link">Book a Table</button>
+            </div>
+
+            <div class="reservations-grid" *ngIf="reservations.length > 0">
+                <div *ngFor="let res of reservations" class="res-card">
+                    <div class="res-header">
+                        <span class="date">{{ res.date | date:'mediumDate' }}</span>
+                        <span class="status" [class]="res.status">{{ res.status | titlecase }}</span>
+                    </div>
+                    <div class="res-body">
+                        <div class="time-slot">
+                            <span class="icon">🕒</span>
+                            <span>{{ res.startTime }} - {{ res.endTime }}</span>
+                        </div>
+                        <div class="table-info">
+                            <span class="icon">🪑</span>
+                            <span>Table {{ res.table?.tableNumber || 'N/A' }}</span>
+                        </div>
+                        <div class="guests-info">
+                            <span class="icon">👥</span>
+                            <span>{{ res.guests }} Guests</span>
+                        </div>
+                    </div>
+                    <div class="res-footer">
+                        <div class="footer-info">
+                            <span class="res-id">#{{ res._id | slice:-6 }}</span>
+                            <span class="guest-name">{{ res.guestDetails?.name }}</span>
+                        </div>
+                        <button class="btn-cancel" *ngIf="res.status !== 'cancelled' && res.status !== 'completed'"
+                            (click)="cancelReservation(res._id)">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link" *ngIf="!searched">
+            <a routerLink="/reservation">← Make a New Reservation</a>
+        </div>
+    </div>
+</div>

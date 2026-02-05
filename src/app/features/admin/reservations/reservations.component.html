@@ -1,0 +1,241 @@
+<div class="reservations-container">
+    <div class="page-header">
+        <div class="header-left">
+            <h1>Reservations</h1>
+            <p class="subtitle">Manage all table bookings</p>
+        </div>
+        <div class="header-right">
+            <div class="search-bar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                        stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+                    placeholder="Search by name, email, phone, or table...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-box" (click)="onStatusFilterChange('all')" [class.active]="statusFilter === 'all'">
+            <span class="stat-label">Total</span>
+            <div class="stat-value">{{ stats.total }}</div>
+        </div>
+        <div class="stat-box" (click)="onStatusFilterChange('confirmed')" [class.active]="statusFilter === 'confirmed'">
+            <span class="stat-label">Confirmed</span>
+            <div class="stat-value text-green">{{ stats.confirmed }}</div>
+        </div>
+        <div class="stat-box" (click)="onStatusFilterChange('completed')" [class.active]="statusFilter === 'completed'">
+            <span class="stat-label">Completed</span>
+            <div class="stat-value text-blue">{{ stats.completed }}</div>
+        </div>
+        <div class="stat-box" (click)="onStatusFilterChange('cancelled')" [class.active]="statusFilter === 'cancelled'">
+            <span class="stat-label">Cancelled</span>
+            <div class="stat-value text-red">{{ stats.cancelled }}</div>
+        </div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="filters-row">
+        <div class="filter-group">
+            <label>Filter by Date</label>
+            <input type="date" [(ngModel)]="dateFilter" (ngModelChange)="onDateFilterChange()">
+        </div>
+        <button class="btn-reset" *ngIf="dateFilter || statusFilter !== 'all'"
+            (click)="statusFilter = 'all'; dateFilter = ''; applyFilters()">
+            Reset Filters
+        </button>
+    </div>
+
+    <!-- Reservations Table -->
+    <div class="reservations-table" *ngIf="!loading">
+        <div class="table-header">
+            <div class="th th-id">ID</div>
+            <div class="th th-guest">Guest</div>
+            <div class="th th-table">Table</div>
+            <div class="th th-datetime">Date & Time</div>
+            <div class="th th-guests">Guests</div>
+            <div class="th th-status">Status</div>
+            <div class="th th-actions">Actions</div>
+        </div>
+
+        <div class="table-body">
+            <div class="table-row" *ngFor="let reservation of filteredReservations">
+                <div class="td td-id">
+                    <span class="res-id">{{ reservation._id.slice(-6) }}</span>
+                </div>
+                <div class="td td-guest">
+                    <div class="guest-info">
+                        <strong>{{ reservation.guestDetails.name }}</strong>
+                        <small>{{ reservation.guestDetails.email }}</small>
+                        <small>{{ reservation.guestDetails.phone }}</small>
+                    </div>
+                </div>
+                <div class="td td-table">
+                    <div class="table-badge">
+                        <span class="table-num">T{{ reservation.table.tableNumber }}</span>
+                        <span class="table-type">{{ reservation.table.type }}</span>
+                    </div>
+                </div>
+                <div class="td td-datetime">
+                    <div class="datetime-info">
+                        <strong>{{ formatDate(reservation.date) }}</strong>
+                        <small>{{ reservation.startTime }} - {{ reservation.endTime }}</small>
+                    </div>
+                </div>
+                <div class="td td-guests">
+                    <div class="guests-count">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        {{ reservation.guests }}
+                    </div>
+                </div>
+                <div class="td td-status">
+                    <span class="status-badge" [ngClass]="getStatusClass(reservation.status)">
+                        {{ reservation.status | titlecase }}
+                    </span>
+                </div>
+                <div class="td td-actions">
+                    <div class="action-buttons">
+                        <button class="btn-icon" (click)="openDetailsModal(reservation)" title="View Details">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                        <button class="btn-icon btn-delete" (click)="openDeleteModal(reservation)" title="Cancel">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state" *ngIf="filteredReservations.length === 0">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <p>No reservations found</p>
+            <small>Try adjusting your filters</small>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Loading reservations...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+    </div>
+
+    <!-- Reservation Details Modal -->
+    <div class="modal-overlay" *ngIf="showDetailsModal" (click)="showDetailsModal = false">
+        <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Reservation Details</h2>
+                <button class="close-btn" (click)="showDetailsModal = false">&times;</button>
+            </div>
+            <div class="modal-body" *ngIf="selectedReservation">
+                <div class="details-grid">
+                    <div class="detail-section">
+                        <h3>Guest Information</h3>
+                        <p><strong>Name:</strong> {{ selectedReservation.guestDetails.name }}</p>
+                        <p><strong>Email:</strong> {{ selectedReservation.guestDetails.email }}</p>
+                        <p><strong>Phone:</strong> {{ selectedReservation.guestDetails.phone }}</p>
+                        <p *ngIf="selectedReservation.guestDetails.specialRequest">
+                            <strong>Special Request:</strong> {{ selectedReservation.guestDetails.specialRequest }}
+                        </p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Booking Information</h3>
+                        <p><strong>Date:</strong> {{ formatDate(selectedReservation.date) }}</p>
+                        <p><strong>Time:</strong> {{ selectedReservation.startTime }} - {{ selectedReservation.endTime
+                            }}</p>
+                        <p><strong>Guests:</strong> {{ selectedReservation.guests }} People</p>
+                        <p><strong>Status:</strong>
+                            <span class="status-badge" [ngClass]="getStatusClass(selectedReservation.status)">
+                                {{ selectedReservation.status | titlecase }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="detail-section full-width">
+                        <h3>Table Assignment</h3>
+                        <div class="assigned-table-card">
+                            <div class="table-info">
+                                <span class="table-label">Table</span>
+                                <span class="table-value">{{ selectedReservation.table.tableNumber }}</span>
+                            </div>
+                            <div class="table-info">
+                                <span class="table-label">Capacity</span>
+                                <span class="table-value">{{ selectedReservation.table.capacity }} People</span>
+                            </div>
+                            <div class="table-info">
+                                <span class="table-label">Type</span>
+                                <span class="table-value">{{ selectedReservation.table.type }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="status-actions" *ngIf="selectedReservation?.status !== 'cancelled'">
+                    <button class="btn-status btn-confirm" *ngIf="selectedReservation?.status === 'pending'"
+                        (click)="updateStatus(selectedReservation!._id, 'confirmed')">
+                        Confirm Booking
+                    </button>
+                    <button class="btn-status btn-complete" *ngIf="selectedReservation?.status === 'confirmed'"
+                        (click)="updateStatus(selectedReservation!._id, 'completed')">
+                        Mark as Completed
+                    </button>
+                </div>
+                <button class="btn-secondary" (click)="showDetailsModal = false">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal (Product-style) -->
+    <div class="modal-overlay danger" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+        <div class="modal-confirm" (click)="$event.stopPropagation()">
+            <div class="danger-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF4D4D" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <h3>Delete Reservation</h3>
+            <p>Are you sure you want to delete the reservation for <strong>"{{ selectedReservation?.guestDetails?.name
+                    }}"</strong>? This action will permanently remove the record from the system.
+            </p>
+            <div class="confirm-footer">
+                <button class="btn-ghost" (click)="showDeleteModal = false">Keep Reservation</button>
+                <button class="btn-danger-premium" (click)="confirmDelete()" [disabled]="isDeleting">
+                    {{ isDeleting ? 'Deleting...' : 'Delete Reservation' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

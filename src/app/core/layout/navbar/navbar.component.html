@@ -11,8 +11,10 @@
                 (click)="closeMenu()">Home</a>
             <a routerLink="/menu" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Menu</a>
             <a routerLink="/about" class="nav-link" routerLinkActive="active" (click)="closeMenu()">About</a>
-            <a routerLink="/reservation" class="nav-link" routerLinkActive="active"
-                (click)="closeMenu()">Reservation</a>
+            <a routerLink="/reservation" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Reserve
+                Table</a>
+            <a routerLink="/my-reservations" class="nav-link" routerLinkActive="active" (click)="closeMenu()">My
+                Reservations</a>
             <ng-container *ngIf="!authService.isLoggedIn()">
                 <a routerLink="/login" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Login</a>
                 <a routerLink="/register" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Register</a>

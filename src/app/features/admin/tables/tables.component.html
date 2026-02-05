@@ -1,17 +1,21 @@
 <div class="tables-container">
     <div class="page-header">
         <div class="header-left">
-             <h1>Tables</h1>
-             <p class="subtitle">Manage table availability and reservations</p>
+            <h1>Tables</h1>
+            <p class="subtitle">Manage table availability and reservations</p>
         </div>
         <div class="header-right">
-             <div class="search-bar">
+            <div class="search-bar">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                        d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                        stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
                 </svg>
                 <input type="text" [(ngModel)]="searchTerm" placeholder="Search tables...">
             </div>
+            <button class="btn-primary" (click)="openCreateModal()">+ Add Table</button>
         </div>
     </div>
 
@@ -28,42 +32,123 @@
         <div class="legend-item"><span class="dot available"></span> Available</div>
         <div class="legend-item"><span class="dot occupied"></span> Occupied</div>
         <div class="legend-item"><span class="dot reserved"></span> Reserved</div>
-        <div class="legend-item"><span class="dot cleaning"></span> Cleaning</div>
     </div>
 
     <!-- Tables Grid -->
     <div class="tables-grid">
         <div class="table-card" *ngFor="let table of filteredTables" [ngClass]="getCardClass(table.status)">
             <div class="card-top">
-                <div class="table-id" [ngClass]="getStatusClass(table.status)">• {{ table.id }}</div>
+                <div class="table-id" [ngClass]="getStatusClass(table.status)">T{{ table.tableNumber }}</div>
                 <div class="more-options">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                    <button class="btn-icon" (click)="openDeleteModal(table)">🗑️</button>
                 </div>
             </div>
-            
+
             <div class="card-content">
                 <div class="seats-info">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
-                   <span>{{ table.seats }} seats</span>
-                </div>
-                
-                <div class="status-label" [ngClass]="getStatusClass(table.status)">
-                    {{ table.status }}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 11a9 9 0 0 1 9 9"></path>
+                        <path d="M4 4a16 16 0 0 1 16 16"></path>
+                        <circle cx="5" cy="19" r="1"></circle>
+                    </svg>
+                    <span>{{ table.capacity }} seats</span>
                 </div>
 
-                <div class="customer-info" *ngIf="table.status !== 'Available' && table.status !== 'Cleaning'">
-                    <div class="c-name">{{ table.customer }}</div>
-                    <div class="c-time" *ngIf="table.time">{{ table.time }}</div>
+                <div class="status-label" [ngClass]="getStatusClass(table.status)">
+                    {{ table.status | titlecase }}
                 </div>
-                
-                <div class="empty-spacer" *ngIf="table.status === 'Available' || table.status === 'Cleaning'"></div>
+
+                <div class="seats-info" style="margin-top: 5px; font-size: 0.8rem; color: #777;">
+                    Type: {{ table.type || 'Standard' }}
+                </div>
             </div>
 
             <div class="card-actions">
-                <button class="btn-action" *ngIf="table.status === 'Available' || table.status === 'Cleaning'">Assign</button>
-                <button class="btn-action outline" *ngIf="table.status === 'Occupied'">Free Up</button>
-                <button class="btn-action outline" *ngIf="table.status === 'Reserved'">Check In</button>
+                <button class="btn-action" (click)="openEditModal(table)">Edit</button>
+                <button class="btn-action outline" *ngIf="table.status === 'occupied'">Free Up</button>
             </div>
         </div>
+
+        <div *ngIf="filteredTables.length === 0 && !loading" class="empty-state">
+            No tables found. Add one to get started.
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal (Product-style) -->
+    <div class="modal-overlay danger" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+        <div class="modal-confirm" (click)="$event.stopPropagation()">
+            <div class="danger-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF4D4D" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <h3>Delete Table</h3>
+            <p>Are you sure you want to remove <strong>Table {{ selectedTable?.tableNumber }}</strong>? This action is
+                permanent.
+            </p>
+            <div class="confirm-footer">
+                <button class="btn-ghost" (click)="showDeleteModal = false">Keep Table</button>
+                <button class="btn-danger-premium" (click)="confirmDelete()" [disabled]="isDeleting">
+                    {{ isDeleting ? 'Deleting...' : 'Delete Table' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Overlay (Add/Edit) -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>{{ isEditMode ? 'Edit Table' : 'Add New Table' }}</h2>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+
+        <form [formGroup]="tableForm" (ngSubmit)="onSubmit()">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Table Number (or ID)</label>
+                    <input type="text" formControlName="tableNumber" placeholder="e.g. 1, 12, A1">
+                </div>
+
+                <div class="form-group">
+                    <label>Capacity (Seats)</label>
+                    <input type="number" formControlName="capacity" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>Table Type</label>
+                    <select formControlName="type">
+                        <option value="Standard">Standard</option>
+                        <option value="Window">Window</option>
+                        <option value="Booth">Booth</option>
+                        <option value="Center">Center</option>
+                    </select>
+                </div>
+
+                <div class="form-group" *ngIf="isEditMode">
+                    <label>Status</label>
+                    <select formControlName="status">
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="reserved">Reserved</option>
+                    </select>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" (click)="closeModal()">Cancel</button>
+                <button type="submit" class="btn-primary" [disabled]="loading || tableForm.invalid">
+                    {{ loading ? 'Saving...' : 'Save Table' }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>

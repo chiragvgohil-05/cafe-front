@@ -1,84 +1,79 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ReservationService } from '../../core/services/reservation.service';
+import { Router, RouterModule } from '@angular/router';
 
 interface Table {
-  id: number;
-  name: string;
+  _id: string;
+  tableNumber: string;
   capacity: number;
-  status: 'available' | 'booked' | 'reserved';
-  type: 'Window' | 'Center' | 'Booth';
+  status: 'available' | 'occupied' | 'reserved';
+  type: string;
 }
 
-interface Product {
-  id: number;
+interface MenuItem {
+  _id: string;
   name: string;
   price: number;
-  category: 'Coffee' | 'Snacks' | 'Dessert';
-  image: string;
+  category: string;
+  image?: string;
+  description?: string;
 }
 
-interface CartItem extends Product {
+interface CartItem extends MenuItem {
   quantity: number;
 }
 
 @Component({
   selector: 'app-reservation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
   templateUrl: './reservation.component.html',
   styleUrl: './reservation.component.css',
 })
-export class Reservation {
+export class Reservation implements OnInit {
+  private reservationService = inject(ReservationService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
   currentStep = 1;
   bookingForm: FormGroup;
 
   // State
   selectedTable: Table | null = null;
+  availableTables: Table[] = [];
   cart: CartItem[] = [];
   bookingId: string = '';
+  loading = false;
+  errorMessage = '';
 
-  // Mock Data
-  tables: Table[] = [
-    // 2 Seaters (8 tables)
-    { id: 1, name: 'T1', capacity: 2, status: 'available', type: 'Window' },
-    { id: 2, name: 'T2', capacity: 2, status: 'booked', type: 'Window' },
-    { id: 3, name: 'T3', capacity: 2, status: 'available', type: 'Center' },
-    { id: 4, name: 'T4', capacity: 2, status: 'available', type: 'Center' },
-    { id: 5, name: 'T5', capacity: 2, status: 'available', type: 'Booth' },
-    { id: 6, name: 'T6', capacity: 2, status: 'available', type: 'Booth' },
-    { id: 7, name: 'T7', capacity: 2, status: 'booked', type: 'Center' },
-    { id: 8, name: 'T8', capacity: 2, status: 'available', type: 'Window' },
-    // 4 Seaters (4 tables)
-    { id: 9, name: 'T9', capacity: 4, status: 'available', type: 'Center' },
-    { id: 10, name: 'T10', capacity: 4, status: 'available', type: 'Window' },
-    { id: 11, name: 'T11', capacity: 4, status: 'booked', type: 'Booth' },
-    { id: 12, name: 'T12', capacity: 4, status: 'available', type: 'Center' },
-    // 6 Seaters (2 tables)
-    { id: 13, name: 'T13', capacity: 6, status: 'available', type: 'Booth' },
-    { id: 14, name: 'T14', capacity: 6, status: 'available', type: 'Booth' },
-    // 8 Seaters (2 tables)
-    { id: 15, name: 'T15', capacity: 8, status: 'booked', type: 'Center' },
-    { id: 16, name: 'T16', capacity: 8, status: 'available', type: 'Window' },
-  ];
+  // Menu items from backend
+  menuItems: MenuItem[] = [];
 
-  products: Product[] = [
-    { id: 1, name: 'Cappuccino', price: 4.5, category: 'Coffee', image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=200' },
-    { id: 2, name: 'Latte', price: 5.0, category: 'Coffee', image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=200' },
-    { id: 3, name: 'Croissant', price: 3.5, category: 'Snacks', image: 'https://images.unsplash.com/photo-1555507036-ab1f40388085?w=200' },
-    { id: 4, name: 'Cheesecake', price: 6.0, category: 'Dessert', image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=200' },
-  ];
-
-  timeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.bookingForm = this.fb.group({
       date: [new Date().toISOString().split('T')[0], Validators.required],
-      time: ['', Validators.required],
+      startTime: ['09:00', Validators.required],
+      endTime: ['11:00', Validators.required],
       guests: [2, [Validators.required, Validators.min(1), Validators.max(10)]],
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required]
+      phone: ['', Validators.required],
+      specialRequest: ['']
+    });
+  }
+
+  ngOnInit() {
+    this.loadMenuItems();
+  }
+
+  loadMenuItems() {
+    this.reservationService.getMenuItems().subscribe({
+      next: (items) => {
+        this.menuItems = items;
+      },
+      error: (err) => console.error('Failed to load menu items:', err)
     });
   }
 
@@ -88,22 +83,52 @@ export class Reservation {
 
   // Step Navigation
   nextStep() {
-    if (this.currentStep === 1 && this.bookingForm.invalid) {
-      this.bookingForm.markAllAsTouched();
-      return;
+    if (this.currentStep === 1) {
+      if (this.bookingForm.invalid) {
+        this.bookingForm.markAllAsTouched();
+        return;
+      }
+      this.fetchAvailableTables();
+    } else if (this.currentStep === 2) {
+      if (!this.selectedTable) {
+        alert('Please select a table to proceed.');
+        return;
+      }
+      this.currentStep++;
+    } else if (this.currentStep === 3) {
+      this.currentStep++;
     }
-    if (this.currentStep === 2 && !this.selectedTable) {
-      alert('Please select a table to proceed.');
-      return;
-    }
-    this.currentStep++;
   }
 
   prevStep() {
     this.currentStep--;
+    this.errorMessage = '';
   }
 
-  // Logic
+  // API Logic
+  fetchAvailableTables() {
+    this.loading = true;
+    this.errorMessage = '';
+    const { date, startTime, endTime, guests } = this.bookingForm.value;
+
+    this.reservationService.getAvailableTables(date, startTime, endTime, guests).subscribe({
+      next: (tables) => {
+        this.availableTables = tables;
+        this.loading = false;
+        if (tables.length === 0) {
+          this.errorMessage = 'No tables available for this slot. Please try a different time.';
+        } else {
+          this.currentStep++;
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = 'Failed to fetch tables. Please try again.';
+        console.error(err);
+      }
+    });
+  }
+
   updateGuests(change: number) {
     const currentVal = this.guestCount || 0;
     const newVal = currentVal + change;
@@ -112,24 +137,13 @@ export class Reservation {
     }
   }
 
-  selectTime(time: string) {
-    this.bookingForm.patchValue({ time });
-  }
-
-  isTableValid(table: Table): boolean {
-    if (table.status !== 'available') return false;
-    return table.capacity >= this.guestCount;
-  }
-
   selectTable(table: Table) {
-    if (this.isTableValid(table)) {
-      this.selectedTable = table;
-    }
+    this.selectedTable = table;
   }
 
   // Cart Logic
-  addToCart(product: Product) {
-    const existing = this.cart.find(item => item.id === product.id);
+  addToCart(product: MenuItem) {
+    const existing = this.cart.find(item => item._id === product._id);
     if (existing) {
       existing.quantity++;
     } else {
@@ -137,8 +151,8 @@ export class Reservation {
     }
   }
 
-  removeFromCart(itemId: number) {
-    const index = this.cart.findIndex(item => item.id === itemId);
+  removeFromCart(itemId: string) {
+    const index = this.cart.findIndex(item => item._id === itemId);
     if (index > -1) {
       if (this.cart[index].quantity > 1) {
         this.cart[index].quantity--;
@@ -149,7 +163,33 @@ export class Reservation {
   }
 
   confirmBooking() {
-    this.bookingId = 'BK-' + Math.floor(Math.random() * 10000);
-    this.currentStep = 5; // Success state
+    this.loading = true;
+    const formData = this.bookingForm.value;
+
+    const reservationData = {
+      tableId: this.selectedTable?._id,
+      date: formData.date,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      guests: formData.guests,
+      guestDetails: {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        specialRequest: formData.specialRequest
+      }
+    };
+
+    this.reservationService.createReservation(reservationData).subscribe({
+      next: (res) => {
+        this.bookingId = res.reservation._id;
+        this.loading = false;
+        this.currentStep = 5;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.error?.message || 'Booking failed. Please try again.';
+      }
+    });
   }
 }
