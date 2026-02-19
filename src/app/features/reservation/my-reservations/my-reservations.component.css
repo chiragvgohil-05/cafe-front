@@ -1,3 +1,53 @@
+
+/* Hero Section - Sleek & Modern */
+.reservation-hero {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reservation-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+}
+
+.reservation-hero .content h1{
+    color: #fff !important;
+}
+.reservation-hero .content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white !important;
+    transform: translateY(-20px);
+}
+
+.reservation-hero h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: var(--font-heading);
+    letter-spacing: -1px;
+}
+
+.reservation-hero .subtitle {
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
 .page-container {
     min-height: 80vh;
     padding: 4rem 1rem;

@@ -1,8 +1,13 @@
+<div class="reservation-hero text-center"
+    style="background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
+    <div class="overlay"></div>
+    <div class="content">
+        <h1>My Reservations</h1>
+        <p class="subtitle">Enter your details to find your bookings.</p>
+    </div>
+</div>
 <div class="page-container">
     <div class="content-wrapper">
-        <h2>My Reservations</h2>
-        <p class="subtitle">Enter your details to find your bookings.</p>
-
         <div class="search-box">
             <div class="input-group">
                 <input type="email" [(ngModel)]="email" placeholder="Email Address">
@@ -54,10 +59,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="back-link" *ngIf="!searched">
-            <a routerLink="/reservation">← Make a New Reservation</a>
         </div>
     </div>
 </div>
