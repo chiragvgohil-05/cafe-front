@@ -116,7 +116,7 @@
 }
 
 .nav-item.active {
-    background-color: var(--color-accent-gold);
+    background-color: #fff2e3;
     color: var(--color-coffee-brown);
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(201, 162, 77, 0.3);

@@ -1,14 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MenuCategoryWithItems, MenuService } from '../../core/services/menu.service';
 
 interface MenuItem {
-  id: number;
+  _id: string;
   name: string;
   description: string;
   price: number;
   category: string;
-  image: string;
-  rating: number;
+  image?: string;
+  isAvailable: boolean;
+}
+
+interface SelectedMenuItem extends MenuItem {
+  quantity: number;
 }
 
 @Component({
@@ -18,18 +23,66 @@ interface MenuItem {
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css',
 })
-export class Menu {
-  categories = ['All', 'Coffee', 'Bakery', 'Specials'];
-  currentCategory = 'All';
+export class Menu implements OnInit {
+  private menuService = inject(MenuService);
 
-  menuItems: MenuItem[] = [
-    { id: 1, name: 'Cappuccino Art', description: 'Rich espresso with steamed milk foam art.', price: 4.50, category: 'Coffee', rating: 5, image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80' },
-    { id: 2, name: 'Macaron Set', description: 'Assorted french macarons.', price: 12.00, category: 'Bakery', rating: 4.8, image: 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?auto=format&fit=crop&w=800&q=80' },
-    { id: 3, name: 'Cold Brew', description: 'Steeped for 24 hours for smoothness.', price: 5.00, category: 'Coffee', rating: 4.9, image: 'https://images.unsplash.com/photo-1517701604599-bb29b5c7dd90?auto=format&fit=crop&w=800&q=80' },
-    { id: 4, name: 'Avocado Toast', description: 'Sourdough bread topped with creamy avocado.', price: 8.00, category: 'Specials', rating: 5, image: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=800&q=80' },
-    { id: 5, name: 'Berry Tart', description: 'Fresh berries on a vanilla custard base.', price: 5.25, category: 'Bakery', rating: 4.5, image: 'https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&w=800&q=80' },
-    { id: 6, name: 'Matcha Latte', description: 'Premium grade matcha with oat milk.', price: 5.50, category: 'Coffee', rating: 4.7, image: 'https://images.unsplash.com/photo-1515822966558-6b3bc09025ce?auto=format&fit=crop&w=800&q=80' },
-  ];
+  readonly fallbackImage = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80';
+
+  categories: string[] = ['All'];
+  currentCategory = 'All';
+  loading = false;
+  errorMessage = '';
+
+  menuItems: MenuItem[] = [];
+  selectedItems: SelectedMenuItem[] = [];
+
+  ngOnInit(): void {
+    this.loadMenuItems();
+  }
+
+  private loadMenuItems(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.menuService.getMenuItems().subscribe({
+      next: (res) => {
+        if (!res.success || !Array.isArray(res.data)) {
+          this.menuItems = [];
+          this.categories = ['All'];
+          this.errorMessage = 'Unable to load menu right now.';
+          this.loading = false;
+          return;
+        }
+
+        this.menuItems = res.data.flatMap((category: MenuCategoryWithItems) =>
+          category.items
+            .filter((item) => item.isAvailable)
+            .map((item) => ({
+              _id: item._id ?? `${category._id}-${item.name}`,
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              category: category.name,
+              image: item.image,
+              isAvailable: item.isAvailable
+            }))
+        );
+
+        const dynamicCategories = Array.from(new Set(this.menuItems.map((item) => item.category)));
+        this.categories = ['All', ...dynamicCategories];
+        if (!this.categories.includes(this.currentCategory)) {
+          this.currentCategory = 'All';
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.menuItems = [];
+        this.categories = ['All'];
+        this.errorMessage = 'Unable to load menu right now.';
+        this.loading = false;
+      }
+    });
+  }
 
   get filteredItems() {
     return this.currentCategory === 'All'
@@ -37,7 +90,51 @@ export class Menu {
       : this.menuItems.filter(item => item.category === this.currentCategory);
   }
 
+  get selectedCount(): number {
+    return this.selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  get selectedTotal(): number {
+    return this.selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }
+
   setCategory(category: string) {
     this.currentCategory = category;
+  }
+
+  addToSelection(product: MenuItem): void {
+    const existing = this.selectedItems.find((item) => item._id === product._id);
+    if (existing) {
+      existing.quantity += 1;
+      return;
+    }
+    this.selectedItems.push({ ...product, quantity: 1 });
+  }
+
+  removeFromSelection(productId: string): void {
+    const index = this.selectedItems.findIndex((item) => item._id === productId);
+    if (index === -1) {
+      return;
+    }
+    if (this.selectedItems[index].quantity > 1) {
+      this.selectedItems[index].quantity -= 1;
+    } else {
+      this.selectedItems.splice(index, 1);
+    }
+  }
+
+  getSelectedQuantity(productId: string): number {
+    return this.selectedItems.find((item) => item._id === productId)?.quantity ?? 0;
+  }
+
+  clearSelection(): void {
+    this.selectedItems = [];
+  }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement | null;
+    if (target) {
+      target.src = this.fallbackImage;
+    }
   }
 }

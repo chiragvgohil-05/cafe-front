@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ReservationService } from '../../core/services/reservation.service';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 declare var Razorpay: any;
 
@@ -14,29 +14,15 @@ interface Table {
   type: string;
 }
 
-interface MenuItem {
-  _id: string;
-  name: string;
-  price: number;
-  category: string;
-  image?: string;
-  description?: string;
-}
-
-interface CartItem extends MenuItem {
-  quantity: number;
-}
-
 @Component({
   selector: 'app-reservation',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './reservation.component.html',
   styleUrl: './reservation.component.css',
 })
-export class Reservation implements OnInit {
+export class Reservation {
   private reservationService = inject(ReservationService);
-  private router = inject(Router);
   private fb = inject(FormBuilder);
   private platformId = inject(PLATFORM_ID);
 
@@ -46,15 +32,11 @@ export class Reservation implements OnInit {
   // State
   selectedTable: Table | null = null;
   availableTables: Table[] = [];
-  cart: CartItem[] = [];
   bookingId: string = '';
   loading = false;
   errorMessage = '';
   securityDeposit = 100;
   pendingReservationId: string | null = null;
-
-  // Menu items from backend
-  menuItems: MenuItem[] = [];
 
   constructor() {
     this.bookingForm = this.fb.group({
@@ -69,22 +51,8 @@ export class Reservation implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.loadMenuItems();
-  }
-
-  loadMenuItems() {
-    this.reservationService.getMenuItems().subscribe({
-      next: (items) => {
-        this.menuItems = items;
-      },
-      error: (err) => console.error('Failed to load menu items:', err)
-    });
-  }
-
   // Getters
   get guestCount() { return this.bookingForm.get('guests')?.value; }
-  get cartTotal() { return this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0); }
 
   // Step Navigation
   nextStep() {
@@ -99,8 +67,6 @@ export class Reservation implements OnInit {
         alert('Please select a table to proceed.');
         return;
       }
-      this.currentStep++;
-    } else if (this.currentStep === 3) {
       this.currentStep++;
     }
   }
@@ -144,27 +110,6 @@ export class Reservation implements OnInit {
 
   selectTable(table: Table) {
     this.selectedTable = table;
-  }
-
-  // Cart Logic
-  addToCart(product: MenuItem) {
-    const existing = this.cart.find(item => item._id === product._id);
-    if (existing) {
-      existing.quantity++;
-    } else {
-      this.cart.push({ ...product, quantity: 1 });
-    }
-  }
-
-  removeFromCart(itemId: string) {
-    const index = this.cart.findIndex(item => item._id === itemId);
-    if (index > -1) {
-      if (this.cart[index].quantity > 1) {
-        this.cart[index].quantity--;
-      } else {
-        this.cart.splice(index, 1);
-      }
-    }
   }
 
   confirmBooking() {
@@ -214,7 +159,7 @@ export class Reservation implements OnInit {
         try {
           if (res?.data?.paymentStatus === 'paid') {
             this.loading = false;
-            this.currentStep = 5;
+            this.currentStep = 4;
             this.pendingReservationId = null;
             return;
           }
@@ -304,7 +249,7 @@ export class Reservation implements OnInit {
     }).subscribe({
       next: () => {
         this.loading = false;
-        this.currentStep = 5;
+        this.currentStep = 4;
         this.pendingReservationId = null;
       },
       error: (err) => {

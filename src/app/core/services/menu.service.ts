@@ -12,12 +12,24 @@ export interface Category {
 export interface MenuItem {
     _id?: string;
     cafeId?: string;
-    categoryId: string;
+    categoryId?: string;
     name: string;
     description: string;
     price: number;
     image?: string;
     isAvailable: boolean;
+}
+
+export interface MenuCategoryWithItems {
+    _id: string;
+    name: string;
+    items: MenuItem[];
+}
+
+export interface MenuItemsResponse {
+    success: boolean;
+    message: string;
+    data: MenuCategoryWithItems[];
 }
 
 @Injectable({
@@ -36,8 +48,8 @@ export class MenuService {
         return this.http.get(url);
     }
 
-    getMenuItems(): Observable<any> {
-        return this.http.get(`${this.apiUrl}/menu-list`);
+    getMenuItems(): Observable<MenuItemsResponse> {
+        return this.http.get<MenuItemsResponse>(`${this.apiUrl}/menu-list`);
     }
 
     createMenuItem(formData: FormData): Observable<any> {

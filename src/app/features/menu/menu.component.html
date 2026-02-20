@@ -18,24 +18,67 @@
             </button>
         </div>
 
+        <div class="state-message" *ngIf="loading">
+            Loading products...
+        </div>
+
+        <div class="state-message error" *ngIf="!loading && errorMessage">
+            {{ errorMessage }}
+        </div>
+
         <!-- Regular Menu Grid -->
-        <div class="menu-grid">
+        <div class="menu-grid" *ngIf="!loading && !errorMessage && filteredItems.length > 0">
             <div class="menu-card fade-in" *ngFor="let item of filteredItems">
-                <div class="card-img" [style.background-image]="'url(' + item.image + ')'">
-                    <div class="rating-badge">
-                        <span class="star">★</span> {{ item.rating }}
+                <div class="card-img">
+                    <img [src]="item.image || fallbackImage" [alt]="item.name" loading="lazy" (error)="onImageError($event)">
+                    <div class="category-badge">
+                        {{ item.category }}
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="card-header">
                         <h3>{{ item.name }}</h3>
                     </div>
-                    <p class="card-desc">{{ item.description }}</p>
+                    <p class="card-desc">{{ item.description || 'Freshly prepared and served with care.' }}</p>
                     <div class="price-row">
                         <span class="price">${{ item.price | number:'1.2-2' }}</span>
-                        <button class="btn-icon">+</button>
+                        <button class="btn-icon" type="button" (click)="addToSelection(item)">
+                            +
+                            <span class="qty-badge" *ngIf="getSelectedQuantity(item._id) > 0">
+                                {{ getSelectedQuantity(item._id) }}
+                            </span>
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="state-message" *ngIf="!loading && !errorMessage && filteredItems.length === 0">
+            No products available in this category.
+        </div>
+
+        <div class="selection-panel" *ngIf="selectedItems.length > 0">
+            <div class="selection-header">
+                <h3>Added Products ({{ selectedCount }})</h3>
+                <button type="button" class="btn-clear" (click)="clearSelection()">Clear</button>
+            </div>
+
+            <div class="selection-list">
+                <div class="selection-item" *ngFor="let item of selectedItems">
+                    <div class="selection-info">
+                        <span class="selection-name">{{ item.name }}</span>
+                        <span class="selection-meta">{{ item.quantity }} x ${{ item.price | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="selection-actions">
+                        <button type="button" class="qty-action" (click)="removeFromSelection(item._id)">-</button>
+                        <button type="button" class="qty-action" (click)="addToSelection(item)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selection-total">
+                <span>Total</span>
+                <strong>${{ selectedTotal | number:'1.2-2' }}</strong>
             </div>
         </div>
     </div>

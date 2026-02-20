@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReservationService } from '../../../core/services/reservation.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 interface Reservation {
     _id: string;
@@ -37,6 +38,7 @@ interface Reservation {
 })
 export class ReservationsComponent implements OnInit {
     private reservationService = inject(ReservationService);
+    private toastService = inject(ToastService);
 
     reservations: Reservation[] = [];
     filteredReservations: Reservation[] = [];
@@ -160,11 +162,13 @@ export class ReservationsComponent implements OnInit {
                 this.showDeleteModal = false;
                 this.isDeleting = false;
                 this.selectedReservation = null;
+                this.toastService.success('Reservation deleted successfully');
             },
             error: (err: any) => {
                 console.error(err);
                 this.errorMessage = 'Failed to delete reservation';
                 this.isDeleting = false;
+                this.toastService.error(err?.error?.message || this.errorMessage);
             }
         });
     }
@@ -173,10 +177,12 @@ export class ReservationsComponent implements OnInit {
         this.reservationService.updateReservationStatus(id, newStatus).subscribe({
             next: () => {
                 this.loadReservations();
+                this.toastService.success(`Reservation marked as ${newStatus}`);
             },
             error: (err: any) => {
                 console.error(err);
                 this.errorMessage = 'Failed to update status';
+                this.toastService.error(err?.error?.message || this.errorMessage);
             }
         });
     }

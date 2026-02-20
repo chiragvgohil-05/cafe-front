@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TableService, Table } from '../../../core/services/table.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-tables',
@@ -12,6 +13,7 @@ import { TableService, Table } from '../../../core/services/table.service';
 })
 export class TablesComponent implements OnInit {
   private tableService = inject(TableService);
+  private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
 
   tables: Table[] = [];
@@ -118,10 +120,12 @@ export class TablesComponent implements OnInit {
         next: () => {
           this.loadTables();
           this.closeModal();
+          this.toastService.success('Table updated successfully');
         },
         error: (err) => {
           this.loading = false;
           this.errorMessage = err.error?.message || 'Update failed';
+          this.toastService.error(this.errorMessage);
         }
       });
     } else {
@@ -129,10 +133,12 @@ export class TablesComponent implements OnInit {
         next: () => {
           this.loadTables();
           this.closeModal();
+          this.toastService.success('Table created successfully');
         },
         error: (err) => {
           this.loading = false;
           this.errorMessage = err.error?.message || 'Creation failed';
+          this.toastService.error(this.errorMessage);
         }
       });
     }
@@ -152,10 +158,13 @@ export class TablesComponent implements OnInit {
         this.showDeleteModal = false;
         this.isDeleting = false;
         this.selectedTable = null;
+        this.toastService.success('Table deleted successfully');
       },
       error: (err) => {
         this.isDeleting = false;
-        alert(err.error?.message || 'Delete failed');
+        const message = err.error?.message || 'Delete failed';
+        this.errorMessage = message;
+        this.toastService.error(message);
       }
     });
   }

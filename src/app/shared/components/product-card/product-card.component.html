@@ -1,0 +1,21 @@
+<article class="product-card">
+    <div class="product-image-wrap">
+        <img [src]="product.image || fallbackImage" [alt]="product.name" loading="lazy" class="product-image"
+            (error)="onImageError($event)">
+    </div>
+
+    <div class="product-body">
+        <div class="product-header">
+            <h3>{{ product.name }}</h3>
+            <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
+        </div>
+
+        <p class="product-description">
+            {{ product.description || 'Freshly prepared and served with care.' }}
+        </p>
+
+        <span class="product-category" *ngIf="showCategory && product.categoryName">
+            {{ product.categoryName }}
+        </span>
+    </div>
+</article>

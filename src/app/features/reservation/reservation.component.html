@@ -12,12 +12,11 @@
     <div class="wizard-container">
 
         <!-- Progress Header -->
-        <div class="wizard-header" *ngIf="currentStep < 5">
+        <div class="wizard-header" *ngIf="currentStep < 4">
             <div class="line"></div>
             <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">1. Details</div>
             <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">2. Table</div>
-            <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">3. Menu</div>
-            <div class="step" [class.active]="currentStep >= 4">4. Confirm</div>
+            <div class="step" [class.active]="currentStep >= 3">3. Confirm</div>
         </div>
 
         <!-- Error Message -->
@@ -149,81 +148,8 @@
             </div>
         </div>
 
-        <!-- Step 3: Pre-order -->
+        <!-- Step 3: Summary -->
         <div class="wizard-step fade-in" *ngIf="currentStep === 3">
-            <h2>Pre-order Menu</h2>
-            <p class="subtitle">Optional: Order ahead and skip the wait</p>
-
-            <div class="menu-grid" *ngIf="menuItems.length > 0">
-                <div class="menu-card" *ngFor="let item of menuItems">
-                    <div class="menu-card-image">
-                        <img [src]="item.image || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400'"
-                            [alt]="item.name"
-                            (error)="$any($event.target).src='https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400'">
-                        <div class="menu-overlay">
-                            <button class="btn-add-overlay" (click)="addToCart(item)">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="M12 5v14M5 12h14" />
-                                </svg>
-                                Add to Order
-                            </button>
-                        </div>
-                    </div>
-                    <div class="menu-card-content">
-                        <h4>{{ item.name }}</h4>
-                        <p class="menu-description">{{ item.description || 'Delicious item' }}</p>
-                        <div class="menu-footer">
-                            <span class="price">\${{ item.price | number:'1.2-2' }}</span>
-                            <span class="category-badge">{{ item.category }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="empty-menu" *ngIf="menuItems.length === 0">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-                <p>No menu items available at the moment</p>
-                <small>You can skip this step</small>
-            </div>
-
-            <!-- Floating Cart Summary -->
-            <div class="cart-floating" *ngIf="cart.length > 0">
-                <div class="cart-header">
-                    <h3>Your Pre-order ({{ cart.length }} items)</h3>
-                    <button class="btn-clear" (click)="cart = []">Clear</button>
-                </div>
-                <div class="cart-items-list">
-                    <div class="cart-item-row" *ngFor="let item of cart">
-                        <div class="cart-item-info">
-                            <span class="cart-item-name">{{ item.name }}</span>
-                            <span class="cart-item-price">\${{ item.price | number:'1.2-2' }}</span>
-                        </div>
-                        <div class="cart-item-controls">
-                            <button class="btn-qty" (click)="removeFromCart(item._id)">-</button>
-                            <span class="qty">{{ item.quantity }}</span>
-                            <button class="btn-qty" (click)="addToCart(item)">+</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="cart-total-row">
-                    <span>Subtotal</span>
-                    <strong>\${{ cartTotal | number:'1.2-2' }}</strong>
-                </div>
-            </div>
-
-            <div class="actions row">
-                <button class="btn-secondary" (click)="prevStep()">Back</button>
-                <button class="btn-primary" (click)="nextStep()">
-                    {{ cart.length > 0 ? 'Proceed to Confirm' : 'Skip to Confirm' }}
-                </button>
-            </div>
-        </div>
-
-        <!-- Step 4: Summary -->
-        <div class="wizard-step fade-in" *ngIf="currentStep === 4">
             <h2>Confirm Your Reservation</h2>
             <p class="subtitle">Review your booking details before confirmation</p>
 
@@ -313,40 +239,6 @@
                     </div>
                 </div>
 
-                <!-- Pre-order Summary (if items added) -->
-                <div class="confirm-card" *ngIf="cart.length > 0">
-                    <div class="confirm-header">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <circle cx="9" cy="21" r="1" />
-                            <circle cx="20" cy="21" r="1" />
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                        </svg>
-                        <h3>Pre-order Items</h3>
-                    </div>
-                    <div class="confirm-body">
-                        <div class="order-item" *ngFor="let item of cart">
-                            <div class="order-item-info">
-                                <span class="order-item-name">{{ item.name }}</span>
-                                <span class="order-item-qty">× {{ item.quantity }}</span>
-                            </div>
-                            <span class="order-item-price">\${{ (item.price * item.quantity) | number:'1.2-2' }}</span>
-                        </div>
-                        <div class="order-total">
-                            <span>Subtotal</span>
-                            <strong>\${{ cartTotal | number:'1.2-2' }}</strong>
-                        </div>
-                        <p class="order-note">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <circle cx="12" cy="12" r="10" />
-                                <line x1="12" y1="16" x2="12" y2="12" />
-                                <line x1="12" y1="8" x2="12.01" y2="8" />
-                            </svg>
-                            Your order will be prepared upon arrival
-                        </p>
-                    </div>
-                </div>
             </div>
 
             <div class="actions row">
@@ -357,8 +249,8 @@
             </div>
         </div>
 
-        <!-- Step 5: Success -->
-        <div class="wizard-step success-step fade-in" *ngIf="currentStep === 5">
+        <!-- Step 4: Success -->
+        <div class="wizard-step success-step fade-in" *ngIf="currentStep === 4">
             <div class="success-icon">
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                     stroke-linecap="round" stroke-linejoin="round">

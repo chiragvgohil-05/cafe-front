@@ -35,44 +35,58 @@
     </div>
 
     <!-- Tables Grid -->
-    <div class="tables-grid">
-        <div class="table-card" *ngFor="let table of filteredTables" [ngClass]="getCardClass(table.status)">
-            <div class="card-top">
-                <div class="table-id" [ngClass]="getStatusClass(table.status)">T{{ table.tableNumber }}</div>
-                <div class="more-options">
-                    <button class="btn-icon" (click)="openDeleteModal(table)">🗑️</button>
+    <div class="loading-state" *ngIf="loading">
+        Loading tables...
+    </div>
+
+    <div class="tables-grid" *ngIf="!loading && filteredTables.length > 0">
+        <article class="table-card" *ngFor="let table of filteredTables" [ngClass]="getCardClass(table.status)">
+            <div class="card-header-row">
+                <span class="status-pill" [ngClass]="getStatusClass(table.status)">
+                    <span class="status-dot"></span>
+                    {{ table.status | titlecase }}
+                </span>
+                <button class="icon-btn danger" (click)="openDeleteModal(table)" title="Delete table"
+                    aria-label="Delete table">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="table-identity">
+                <div class="table-number-badge">T{{ table.tableNumber }}</div>
+                <div class="identity-text">
+                    <h3>Table {{ table.tableNumber }}</h3>
+                    <p>{{ table.type || 'Standard' }} setup</p>
                 </div>
             </div>
 
-            <div class="card-content">
-                <div class="seats-info">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 11a9 9 0 0 1 9 9"></path>
-                        <path d="M4 4a16 16 0 0 1 16 16"></path>
-                        <circle cx="5" cy="19" r="1"></circle>
-                    </svg>
-                    <span>{{ table.capacity }} seats</span>
+            <div class="table-meta-grid">
+                <div class="meta-card">
+                    <span class="meta-label">Capacity</span>
+                    <span class="meta-value">{{ table.capacity }} Seats</span>
                 </div>
-
-                <div class="status-label" [ngClass]="getStatusClass(table.status)">
-                    {{ table.status | titlecase }}
-                </div>
-
-                <div class="seats-info" style="margin-top: 5px; font-size: 0.8rem; color: #777;">
-                    Type: {{ table.type || 'Standard' }}
+                <div class="meta-card">
+                    <span class="meta-label">Type</span>
+                    <span class="meta-value">{{ table.type || 'Standard' }}</span>
                 </div>
             </div>
 
             <div class="card-actions">
-                <button class="btn-action" (click)="openEditModal(table)">Edit</button>
-                <button class="btn-action outline" *ngIf="table.status === 'occupied'">Free Up</button>
+                <button class="btn-action primary" (click)="openEditModal(table)">Edit Table</button>
+                <button class="btn-action ghost danger" (click)="openDeleteModal(table)">Delete</button>
             </div>
-        </div>
+        </article>
+    </div>
 
-        <div *ngIf="filteredTables.length === 0 && !loading" class="empty-state">
-            No tables found. Add one to get started.
-        </div>
+    <div *ngIf="!loading && filteredTables.length === 0" class="empty-state">
+        No tables found. Add one to get started.
     </div>
 
     <!-- Confirm Delete Modal (Product-style) -->

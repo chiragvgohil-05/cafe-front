@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuService, Category, MenuItem } from '../../../core/services/menu.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-products',
@@ -12,6 +13,7 @@ import { MenuService, Category, MenuItem } from '../../../core/services/menu.ser
 })
 export class ProductsComponent implements OnInit {
   private menuService = inject(MenuService);
+  private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
 
   searchTerm: string = '';
@@ -138,11 +140,15 @@ export class ProductsComponent implements OnInit {
           if (res.success) {
             this.showProductModal = false;
             this.loadData();
+            this.toastService.success('Product updated successfully');
+          } else {
+            this.toastService.error(res?.message || 'Failed to update product');
           }
           this.isSubmitting = false;
         },
-        error: (err) => {
-          console.error('Update product error:', err);
+        error: (error: unknown) => {
+          console.error('Update product error:', error);
+          this.toastService.error(this.getErrorMessage(error, 'Failed to update product'));
           this.isSubmitting = false;
         }
       });
@@ -152,11 +158,15 @@ export class ProductsComponent implements OnInit {
           if (res.success) {
             this.showProductModal = false;
             this.loadData();
+            this.toastService.success('Product created successfully');
+          } else {
+            this.toastService.error(res?.message || 'Failed to create product');
           }
           this.isSubmitting = false;
         },
-        error: (err) => {
-          console.error('Create product error:', err);
+        error: (error: unknown) => {
+          console.error('Create product error:', error);
+          this.toastService.error(this.getErrorMessage(error, 'Failed to create product'));
           this.isSubmitting = false;
         }
       });
@@ -165,13 +175,30 @@ export class ProductsComponent implements OnInit {
 
   confirmDelete() {
     if (this.selectedProduct) {
-      this.menuService.deleteMenuItem(this.selectedProduct._id).subscribe(res => {
-        if (res.success) {
-          this.showDeleteModal = false;
-          this.loadData();
+      this.menuService.deleteMenuItem(this.selectedProduct._id).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.showDeleteModal = false;
+            this.loadData();
+            this.toastService.success('Product deleted successfully');
+          } else {
+            this.toastService.error(res?.message || 'Failed to delete product');
+          }
+        },
+        error: (error: unknown) => {
+          console.error('Delete product error:', error);
+          this.toastService.error(this.getErrorMessage(error, 'Failed to delete product'));
         }
       });
     }
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    if (typeof error === 'object' && error !== null) {
+      const apiError = error as { error?: { message?: string }; message?: string };
+      return apiError.error?.message || apiError.message || fallback;
+    }
+    return fallback;
   }
 
   getStatusClass(isAvailable: boolean): string {
