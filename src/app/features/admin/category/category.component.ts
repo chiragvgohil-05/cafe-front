@@ -154,4 +154,9 @@ export class CategoryComponent implements OnInit {
     getStatusText(isActive: boolean): string {
         return isActive ? 'Active' : 'Inactive';
     }
+
+    isFieldInvalid(fieldName: string): boolean {
+        const field = this.categoryForm.get(fieldName);
+        return !!(field && field.invalid && (field.dirty || field.touched || this.isSubmitting));
+    }
 }

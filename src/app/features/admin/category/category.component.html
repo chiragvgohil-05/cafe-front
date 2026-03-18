@@ -81,13 +81,10 @@
             </div>
             <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
                 <div class="modal-body">
-                    <div class="form-group">
+                    <div class="form-group" [class.input-error]="isFieldInvalid('name')">
                         <label>Category Name</label>
-                        <input type="text" formControlName="name" placeholder="Enter category name">
-                        <div class="error"
-                            *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.invalid">
-                            Category name is required
-                        </div>
+                        <input type="text" formControlName="name" placeholder="e.g. Beverages">
+                        <span class="error-text" *ngIf="isFieldInvalid('name')">Category name is required</span>
                     </div>
                     <div class="form-group checkbox">
                         <label class="switch">

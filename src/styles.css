@@ -146,3 +146,37 @@ ul {
 .text-cream {
     color: var(--color-cream);
 }
+
+/* Validation Styles */
+.error-text {
+    color: #ff4747;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.input-error input, 
+.input-error select, 
+.input-error textarea {
+    border-color: #ff4747 !important;
+    background-color: #fff8f8 !important;
+}
+
+.input-error label {
+    color: #ff4747 !important;
+}
+
+/* Global Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}

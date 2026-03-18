@@ -61,8 +61,10 @@ export class ReservationsComponent implements OnInit {
     // Modals
     showDeleteModal = false;
     showDetailsModal = false;
+    showStatusModal = false;
     selectedReservation: Reservation | null = null;
     isDeleting = false;
+    pendingStatusUpdate: { id: string, status: string } | null = null;
 
     ngOnInit() {
         this.loadReservations();
@@ -173,17 +175,47 @@ export class ReservationsComponent implements OnInit {
         });
     }
 
-    updateStatus(id: string, newStatus: string) {
-        this.reservationService.updateReservationStatus(id, newStatus).subscribe({
+    openStatusModal(id: string, newStatus: string) {
+        this.pendingStatusUpdate = { id, status: newStatus };
+        this.showStatusModal = true;
+    }
+
+    confirmStatusUpdate() {
+        if (!this.pendingStatusUpdate) return;
+        
+        const { id, status } = this.pendingStatusUpdate;
+        this.reservationService.updateReservationStatus(id, status).subscribe({
             next: () => {
                 this.loadReservations();
-                this.toastService.success(`Reservation marked as ${newStatus}`);
+                this.showStatusModal = false;
+                this.pendingStatusUpdate = null;
+                this.toastService.success(`Reservation marked as ${status}`);
             },
             error: (err: any) => {
                 console.error(err);
                 this.errorMessage = 'Failed to update status';
                 this.toastService.error(err?.error?.message || this.errorMessage);
+                this.showStatusModal = false;
+                this.pendingStatusUpdate = null;
             }
         });
+    }
+
+    updateStatus(id: string, newStatus: string) {
+        if (newStatus === 'cancelled' || newStatus === 'completed') {
+            this.openStatusModal(id, newStatus);
+        } else {
+            this.reservationService.updateReservationStatus(id, newStatus).subscribe({
+                next: () => {
+                    this.loadReservations();
+                    this.toastService.success(`Reservation marked as ${newStatus}`);
+                },
+                error: (err: any) => {
+                    console.error(err);
+                    this.errorMessage = 'Failed to update status';
+                    this.toastService.error(err?.error?.message || this.errorMessage);
+                }
+            });
+        }
     }
 }

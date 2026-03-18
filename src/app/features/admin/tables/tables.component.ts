@@ -187,4 +187,9 @@ export class TablesComponent implements OnInit {
       default: return '';
     }
   }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.tableForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched || this.loading));
+  }
 }

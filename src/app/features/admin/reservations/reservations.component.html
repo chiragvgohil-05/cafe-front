@@ -253,4 +253,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Confirm Status Change Modal -->
+    <div class="modal-overlay" *ngIf="showStatusModal" (click)="showStatusModal = false">
+        <div class="modal-confirm" (click)="$event.stopPropagation()">
+            <div class="confirm-icon" [ngClass]="'status-' + pendingStatusUpdate?.status">
+                <svg *ngIf="pendingStatusUpdate?.status === 'cancelled'" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                <svg *ngIf="pendingStatusUpdate?.status === 'completed'" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3>Update Status?</h3>
+            <p>Are you sure you want to mark this reservation as <strong>{{ pendingStatusUpdate?.status }}</strong>?</p>
+            <div class="confirm-footer">
+                <button class="btn-ghost" (click)="showStatusModal = false">No, Keep as is</button>
+                <button class="btn-confirm-status" [ngClass]="'btn-' + pendingStatusUpdate?.status" (click)="confirmStatusUpdate()">Yes, Update Now</button>
+            </div>
+        </div>
+    </div>
 </div>

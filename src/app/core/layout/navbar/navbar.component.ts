@@ -15,7 +15,18 @@ export class Navbar {
   private router = inject(Router);
   public authService = inject(AuthService);
 
+  showLogoutModal = false;
+
   logout() {
+    this.showLogoutModal = true;
+  }
+
+  cancelLogout() {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout() {
+    this.showLogoutModal = false;
     this.authService.logout();
     this.router.navigate(['/login']);
   }

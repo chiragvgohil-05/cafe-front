@@ -125,15 +125,17 @@
 
         <form [formGroup]="tableForm" (ngSubmit)="onSubmit()">
             <div class="modal-body">
-                <div class="form-group">
-                    <label>Table Number (or ID)</label>
-                    <input type="text" formControlName="tableNumber" placeholder="e.g. 1, 12, A1">
-                </div>
+                    <div class="form-group" [class.input-error]="isFieldInvalid('tableNumber')">
+                        <label>Table Number/Name</label>
+                        <input type="text" formControlName="tableNumber" placeholder="e.g., T-1 or Window Side">
+                        <span class="error-text" *ngIf="isFieldInvalid('tableNumber')">Table number is required</span>
+                    </div>
 
-                <div class="form-group">
-                    <label>Capacity (Seats)</label>
-                    <input type="number" formControlName="capacity" min="1">
-                </div>
+                    <div class="form-group" [class.input-error]="isFieldInvalid('capacity')">
+                        <label>Capacity (Persons)</label>
+                        <input type="number" formControlName="capacity">
+                        <span class="error-text" *ngIf="isFieldInvalid('capacity')">Minimum capacity is 1</span>
+                    </div>
 
                 <div class="form-group">
                     <label>Table Type</label>

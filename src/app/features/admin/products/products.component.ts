@@ -208,4 +208,9 @@ export class ProductsComponent implements OnInit {
   getStatusText(isAvailable: boolean): string {
     return isAvailable ? 'Available' : 'Unavailable';
   }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.productForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched || this.isSubmitting));
+  }
 }

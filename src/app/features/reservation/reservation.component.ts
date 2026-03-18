@@ -64,7 +64,7 @@ export class Reservation {
       this.fetchAvailableTables();
     } else if (this.currentStep === 2) {
       if (!this.selectedTable) {
-        alert('Please select a table to proceed.');
+        this.errorMessage = 'Please select a table to proceed.';
         return;
       }
       this.currentStep++;
