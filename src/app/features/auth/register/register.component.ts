@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
     selector: 'app-register',
@@ -22,7 +23,8 @@ export class RegisterComponent {
 
     constructor(
         private router: Router,
-        private authService: AuthService
+        private authService: AuthService,
+        private toastService: ToastService
     ) { }
 
     togglePasswordVisibility() {
@@ -39,6 +41,7 @@ export class RegisterComponent {
         }
 
         if (this.password !== this.confirmPassword) {
+            this.toastService.warning('Passwords do not match');
             return;
         }
 
@@ -52,11 +55,16 @@ export class RegisterComponent {
             next: (response) => {
                 this.loading = false;
                 if (response.success) {
+                    this.toastService.success('Registration successful! Please login.');
                     this.router.navigate(['/login']);
+                } else {
+                    this.toastService.error(response.message || 'Registration failed');
                 }
             },
             error: (error) => {
                 this.loading = false;
+                const message = error.error?.message || 'Email already exists or server error';
+                this.toastService.error(message);
                 console.error('Registration error:', error);
             }
         });

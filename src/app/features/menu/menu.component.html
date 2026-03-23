@@ -1,85 +1,149 @@
 <section class="menu-page">
-    <!-- Menu Header -->
-    <div class="menu-hero text-center"
-        style="background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-        <div class="overlay"></div>
-        <div class="content relative z-10">
-            <h1 class="text-white">Our Menu</h1>
-            <p class="text-gold subtitle">Handcrafted. Fresh. Delicious.</p>
-        </div>
+  <div class="header-banner">
+    <div class="container container-content">
+      <h1 class="text-white">Our Menu</h1>
+      <p class="text-gold subtitle">Handcrafted coffee & artisan snacks</p>
+    </div>
+  </div>
+
+  <!-- Active Session/Reservation Banner -->
+  <div class="active-banner fade-in" *ngIf="selectedTable">
+    <div class="container banner-inner">
+      <div class="banner-text">
+        <span class="banner-icon">✓</span>
+        <strong *ngIf="activeReservation">Linked to Reservation: Table #{{ selectedTable.tableNumber }}</strong>
+        <strong *ngIf="!activeReservation">You are sitting on Table #{{ selectedTable.tableNumber }}</strong>
+        <span class="banner-time" *ngIf="activeReservation">{{ activeReservation.date }} at {{ activeReservation.startTime }}</span>
+      </div>
+      <div class="banner-actions">
+        <div class="banner-tag">{{ activeReservation ? 'Reserved' : 'Sitting Now' }}</div>
+        <button class="btn-change-table" *ngIf="!activeReservation && selectedItems.length === 0" (click)="showTableSelector = true">Change Table</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container main-content">
+    <!-- Filters -->
+    <div class="menu-filters">
+      <!-- (Optional: Filter implementation if requested) -->
     </div>
 
-    <div class="container main-content">
-        <!-- Filters -->
-        <div class="menu-filters">
-            <button *ngFor="let cat of categories" class="filter-btn" [class.active]="currentCategory === cat"
-                (click)="setCategory(cat)">
-                {{ cat }}
-            </button>
-        </div>
-
-        <div class="state-message" *ngIf="loading">
-            Loading products...
-        </div>
-
-        <div class="state-message error" *ngIf="!loading && errorMessage">
-            {{ errorMessage }}
-        </div>
-
-        <!-- Regular Menu Grid -->
-        <div class="menu-grid" *ngIf="!loading && !errorMessage && filteredItems.length > 0">
-            <div class="menu-card fade-in" *ngFor="let item of filteredItems">
-                <div class="card-img">
-                    <img [src]="item.image || fallbackImage" [alt]="item.name" loading="lazy" (error)="onImageError($event)">
-                    <div class="category-badge">
-                        {{ item.category }}
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="card-header">
-                        <h3>{{ item.name }}</h3>
-                    </div>
-                    <p class="card-desc">{{ item.description || 'Freshly prepared and served with care.' }}</p>
-                    <div class="price-row">
-                        <span class="price">${{ item.price | number:'1.2-2' }}</span>
-                        <button class="btn-icon" type="button" (click)="addToSelection(item)">
-                            +
-                            <span class="qty-badge" *ngIf="getSelectedQuantity(item._id) > 0">
-                                {{ getSelectedQuantity(item._id) }}
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="state-message" *ngIf="!loading && !errorMessage && filteredItems.length === 0">
-            No products available in this category.
-        </div>
-
-        <div class="selection-panel" *ngIf="selectedItems.length > 0">
-            <div class="selection-header">
-                <h3>Added Products ({{ selectedCount }})</h3>
-                <button type="button" class="btn-clear" (click)="clearSelection()">Clear</button>
-            </div>
-
-            <div class="selection-list">
-                <div class="selection-item" *ngFor="let item of selectedItems">
-                    <div class="selection-info">
-                        <span class="selection-name">{{ item.name }}</span>
-                        <span class="selection-meta">{{ item.quantity }} x ${{ item.price | number:'1.2-2' }}</span>
-                    </div>
-                    <div class="selection-actions">
-                        <button type="button" class="qty-action" (click)="removeFromSelection(item._id)">-</button>
-                        <button type="button" class="qty-action" (click)="addToSelection(item)">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="selection-total">
-                <span>Total</span>
-                <strong>${{ selectedTotal | number:'1.2-2' }}</strong>
-            </div>
-        </div>
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="loader"></div>
+      <p>Brewing your menu...</p>
     </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="errorMessage">
+      <p>{{ errorMessage }}</p>
+      <button class="btn-primary" (click)="ngOnInit()">Try Again</button>
+    </div>
+
+    <div class="menu-layout">
+      <!-- Menu Grid -->
+      <div class="menu-grid" *ngIf="!loading && !errorMessage && filteredItems.length > 0">
+        <div class="menu-card fade-in" *ngFor="let item of filteredItems">
+          <div class="card-img" (click)="addToCart(item)">
+            <img [src]="item.image || fallbackImage" [alt]="item.name" loading="lazy" (error)="onImageError($event)">
+            <div class="category-badge">
+              {{ item.category }}
+            </div>
+            <div class="hover-overlay">
+              <span>Quick Add +</span>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3>{{ item.name }}</h3>
+            <p class="description">{{ item.description }}</p>
+            <div class="card-footer">
+              <span class="price">₹{{ item.price | number:'1.2-2' }}</span>
+              <button class="btn-add" (click)="addToCart(item)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Order / Cart Preview (Internal View) -->
+      <div class="order-preview-panel" *ngIf="selectedItems.length > 0">
+        <div class="panel-header">
+          <h3>Your Selection</h3>
+          <button (click)="clearSelection()" class="btn-link">Clear All</button>
+        </div>
+        
+        <div class="cart-items-list">
+          <div class="cart-item fade-in" *ngFor="let item of selectedItems">
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-price">₹{{ item.price * item.quantity | number:'1.2-2' }}</span>
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" (click)="removeFromCart(item._id)">-</button>
+              <span class="qty-val">{{ item.quantity }}</span>
+              <button class="qty-btn" (click)="addToCart(item)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-footer">
+          <div class="total-line">
+            <span>Total Amount</span>
+            <strong>₹{{ selectedTotal | number:'1.2-2' }}</strong>
+          </div>
+          <button class="btn-checkout-primary" (click)="initiateCheckout()">
+            {{ selectedTable ? 'Place Live Order' : 'Select Table & Order' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && filteredItems.length === 0">
+      <span class="icon">☕</span>
+      <p>No items found in this section.</p>
+    </div>
+
+    <!-- Sticky Cart Summary (Fallback for Mobile) -->
+    <div class="cart-summary mobile-only" *ngIf="selectedItems.length > 0">
+      <div class="total-row">
+        <div class="cart-info">
+          <span>Items: {{ selectedItems.length }}</span>
+          <strong>₹{{ selectedTotal | number:'1.2-2' }}</strong>
+        </div>
+        <button class="btn-checkout" (click)="initiateCheckout()">
+          Place Order
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Selection Modal -->
+  <div class="modal-overlay fade-in" *ngIf="showTableSelector" (click)="showTableSelector = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Choose Your Table</h2>
+        <p>You need to select a table to place a live order.</p>
+      </div>
+      
+      <div class="table-grid-modal">
+        <div class="table-item" *ngFor="let table of availableTables" (click)="selectTable(table)">
+          <div class="table-icon">🪑</div>
+          <div class="table-details">
+            <span class="table-num">Table #{{ table.tableNumber }}</span>
+            <span class="table-type">{{ table.type }} • {{ table.capacity }} Guests</span>
+          </div>
+          <div class="selection-arrow">→</div>
+        </div>
+      </div>
+      
+      <button class="btn-close-modal" (click)="showTableSelector = false">Back to Menu</button>
+    </div>
+  </div>
 </section>

@@ -10,6 +10,10 @@ export class ReservationService {
 
     constructor(private http: HttpClient) { }
 
+    getActiveReservation(): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/active-reservation`);
+    }
+
     getAvailableTables(date: string, startTime: string, endTime: string, guests: number): Observable<any[]> {
         const params = new HttpParams()
             .set('date', date)

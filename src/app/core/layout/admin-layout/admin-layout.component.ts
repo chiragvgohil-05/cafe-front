@@ -13,7 +13,7 @@ import { ToastComponent } from '../../../shared/components/toast/toast.component
 })
 export class AdminLayout {
   isSidebarOpen = true;
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   toggleSidebar() {

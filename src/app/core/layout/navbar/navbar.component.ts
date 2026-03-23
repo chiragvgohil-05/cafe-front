@@ -16,6 +16,19 @@ export class Navbar {
   public authService = inject(AuthService);
 
   showLogoutModal = false;
+  isUserDropdownOpen = false;
+
+  toggleUserDropdown() {
+    this.isUserDropdownOpen = !this.isUserDropdownOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-dropdown-container')) {
+      this.isUserDropdownOpen = false;
+    }
+  }
 
   logout() {
     this.showLogoutModal = true;

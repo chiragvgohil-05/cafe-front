@@ -1,88 +1,102 @@
 <div class="orders-container">
-    <div class="page-header">
-        <h1>Orders</h1>
-        <p class="subtitle">Track and manage all orders</p>
+  <!-- Stats Header -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of orderStats">
+      <span class="stat-label">{{ stat.label }}</span>
+      <h2 [class]="stat.color">{{ stat.value }}</h2>
+    </div>
+  </div>
+
+  <!-- Filters & Search -->
+  <div class="controls-row">
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <path d="M21 21l-4.35-4.35" />
+      </svg>
+      <input type="text" placeholder="Search by Order ID or Customer..." [(ngModel)]="searchTerm">
     </div>
 
-    <!-- Order Stats -->
-    <div class="stats-row">
-        <div class="stat-box" *ngFor="let stat of orderStats">
-            <span class="stat-label">{{ stat.label }}</span>
-            <div class="stat-value" [ngClass]="stat.color">{{ stat.value }}</div>
-        </div>
+    <div class="filter-actions">
+      <select class="status-select" [(ngModel)]="selectedStatus">
+        <option>All Status</option>
+        <option value="pending">Pending</option>
+        <option value="preparing">Preparing</option>
+        <option value="served">Served</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn-refresh" (click)="loadOrders()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-card">
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div>
     </div>
 
-    <!-- Filters & Actions -->
-    <div class="filters-bar">
-         <div class="search-bar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <input type="text" [(ngModel)]="searchTerm" placeholder="Search by order ID or customer...">
-        </div>
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Items Summary</th>
+          <th>Table</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of filteredOrders" class="fade-in">
+          <td><span class="order-id">#{{ order._id.slice(-6) }}</span></td>
+          <td>
+            <div class="customer-info">
+              <span class="name">{{ order.userId?.name || 'Guest User' }}</span>
+              <span class="time">{{ order.createdAt | date:'shortTime' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="items-cell" [title]="getItemSummary(order.items)">
+              {{ getItemSummary(order.items) }}
+            </div>
+          </td>
+          <td><span class="table-badge">T{{ order.tableId?.tableNumber || '-' }}</span></td>
+          <td><span class="total">₹{{ order.totalAmount | number:'1.2-2' }}</span></td>
+          <td>
+            <span class="status-badge" [class]="getStatusClass(order.orderStatus)">
+              {{ order.orderStatus | titlecase }}
+            </span>
+          </td>
+          <td>
+            <div class="action-dropdown" *ngIf="order.orderStatus !== 'completed' && order.orderStatus !== 'cancelled'">
+              <select (change)="onStatusChange(order._id, $any($event.target).value)" class="update-select">
+                <option value="" disabled selected>Update...</option>
+                <option value="preparing">Preparing</option>
+                <option value="served">Served</option>
+                <option value="completed">Finish / Done</option>
+                <option value="cancelled">Cancel</option>
+              </select>
+            </div>
+            <span class="done-label" *ngIf="order.orderStatus === 'completed'">
+              ✓ Finished
+            </span>
+            <span class="cancelled-label" *ngIf="order.orderStatus === 'cancelled'">
+              ✕ Cancelled
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-        <div class="status-filter">
-            <select [(ngModel)]="selectedStatus">
-                <option value="All Status">All Status</option>
-                <option value="Completed">Completed</option>
-                <option value="Preparing">Preparing</option>
-                <option value="Pending">Pending</option>
-                <option value="Cancelled">Cancelled</option>
-            </select>
-        </div>
+    <div class="empty-state" *ngIf="!loading && filteredOrders.length === 0">
+      <span class="icon">🔍</span>
+      <p>No orders matched your filters.</p>
     </div>
-
-    <!-- Orders Table -->
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Items</th>
-                    <th>Table</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Time</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let order of filteredOrders">
-                    <td class="font-bold text-brown">
-                        {{ order.id }}
-                    </td>
-                    <td>
-                        <div class="customer-cell">
-                             <div class="avatar-sm">
-                                {{ order.customer.split(' ')[0][0] }}{{ order.customer.split(' ')[1][0] }}
-                            </div>
-                            <span>{{ order.customer }}</span>
-                        </div>
-                    </td>
-                    <td class="text-muted">{{ order.items }}</td>
-                    <td>
-                        <span class="table-badge">{{ order.table }}</span>
-                    </td>
-                    <td class="font-bold">{{ order.total }}</td>
-                    <td>
-                        <span class="status-badge" [ngClass]="getStatusClass(order.status)">
-                            <span class="dot" *ngIf="order.status === 'Completed'">✓</span>
-                            <span class="dot" *ngIf="order.status === 'Preparing'">⟳</span>
-                            <span class="dot" *ngIf="order.status === 'Pending'">!</span>
-                            <span class="dot" *ngIf="order.status === 'Cancelled'">✕</span>
-                            {{ order.status }}
-                        </span>
-                    </td>
-                    <td class="text-muted text-sm">{{ order.time }}</td>
-                    <td>
-                        <button class="action-btn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+  </div>
 </div>

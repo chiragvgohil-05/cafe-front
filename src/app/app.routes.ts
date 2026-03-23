@@ -27,6 +27,10 @@ export const routes: Routes = [
       {
         path: 'my-reservations',
         loadComponent: () => import('./features/reservation/my-reservations/my-reservations.component').then(m => m.MyReservationsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
       }
     ]
   },
@@ -47,6 +51,14 @@ export const routes: Routes = [
       {
         path: 'products',
         loadComponent: () => import('./features/admin/products/products.component').then(m => m.ProductsComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/admin/users/users.component').then(m => m.UsersComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./features/admin/orders/orders.component').then(m => m.OrdersComponent)
       },
       {
         path: 'categories',

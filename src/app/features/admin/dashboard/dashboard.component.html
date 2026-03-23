@@ -15,7 +15,6 @@
                 </div>
             </div>
             <div class="stat-icon" [ngClass]="stat.iconBg">
-                <!-- Icons based on label (simplified logic or SVG injection) -->
                 <svg *ngIf="stat.label === 'Total Revenue'" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -39,6 +38,59 @@
                     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                     <polyline points="17 6 23 6 23 12"></polyline>
                 </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Recent Orders -->
+        <div class="grid-card recent-orders">
+            <div class="card-header">
+                <h2>Recent Orders</h2>
+                <button class="view-all">View All</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let order of recentOrders">
+                            <td><span class="order-id">{{ order.id }}</span></td>
+                            <td>{{ order.customer }}</td>
+                            <td>{{ order.items }}</td>
+                            <td class="amount">{{ order.total }}</td>
+                            <td><span [class]="'status-badge ' + getStatusClass(order.status)">{{ order.status }}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Popular Items -->
+        <div class="grid-card popular-items">
+            <div class="card-header">
+                <h2>Popular Items</h2>
+            </div>
+            <div class="popular-list">
+                <div class="popular-item" *ngFor="let item of popularItems">
+                    <div class="item-info">
+                        <div class="item-main">
+                            <h3>{{ item.name }}</h3>
+                            <span class="item-stats">{{ item.orders }} orders</span>
+                        </div>
+                        <span class="item-price">{{ item.price }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="item.percentage"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
