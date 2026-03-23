@@ -53,22 +53,6 @@
     line-height: 1;
 }
 
-.stat-change {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #e53e3e;
-}
-
-.stat-change.positive {
-    color: #38a169;
-}
-
-.change-text {
-    color: #a0aec0;
-    font-weight: 400;
-    font-size: 0.8rem;
-    margin-left: 2px;
-}
 
 .stat-icon {
     width: 56px;

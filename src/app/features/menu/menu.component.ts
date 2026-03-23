@@ -174,7 +174,9 @@ export class Menu implements OnInit {
     this.selectedTable = table;
     this.showTableSelector = false;
     this.toastService.info(`Selected Table #${table.tableNumber}`);
-    this.processOrder();
+    if (this.selectedItems.length > 0) {
+      this.processOrder();
+    }
   }
 
   private processOrder(): void {

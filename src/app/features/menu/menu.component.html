@@ -13,11 +13,11 @@
         <span class="banner-icon">✓</span>
         <strong *ngIf="activeReservation">Linked to Reservation: Table #{{ selectedTable.tableNumber }}</strong>
         <strong *ngIf="!activeReservation">You are sitting on Table #{{ selectedTable.tableNumber }}</strong>
-        <span class="banner-time" *ngIf="activeReservation">{{ activeReservation.date }} at {{ activeReservation.startTime }}</span>
+        <span class="banner-time" *ngIf="activeReservation">{{ activeReservation.date }} at {{
+          activeReservation.startTime }}</span>
       </div>
       <div class="banner-actions">
         <div class="banner-tag">{{ activeReservation ? 'Reserved' : 'Sitting Now' }}</div>
-        <button class="btn-change-table" *ngIf="!activeReservation && selectedItems.length === 0" (click)="showTableSelector = true">Change Table</button>
       </div>
     </div>
   </div>
@@ -74,7 +74,7 @@
           <h3>Your Selection</h3>
           <button (click)="clearSelection()" class="btn-link">Clear All</button>
         </div>
-        
+
         <div class="cart-items-list">
           <div class="cart-item fade-in" *ngFor="let item of selectedItems">
             <div class="item-info">
@@ -117,7 +117,7 @@
         <button class="btn-checkout" (click)="initiateCheckout()">
           Place Order
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
+            <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </button>
       </div>
@@ -131,7 +131,7 @@
         <h2>Choose Your Table</h2>
         <p>You need to select a table to place a live order.</p>
       </div>
-      
+
       <div class="table-grid-modal">
         <div class="table-item" *ngFor="let table of availableTables" (click)="selectTable(table)">
           <div class="table-icon">🪑</div>
@@ -142,7 +142,7 @@
           <div class="selection-arrow">→</div>
         </div>
       </div>
-      
+
       <button class="btn-close-modal" (click)="showTableSelector = false">Back to Menu</button>
     </div>
   </div>

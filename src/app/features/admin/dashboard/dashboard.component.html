@@ -10,9 +10,6 @@
             <div class="stat-info">
                 <span class="stat-label">{{ stat.label }}</span>
                 <div class="stat-value">{{ stat.value }}</div>
-                <div class="stat-change" [class.positive]="stat.isPositive">
-                    {{ stat.change }} <span class="change-text">from last month</span>
-                </div>
             </div>
             <div class="stat-icon" [ngClass]="stat.iconBg">
                 <svg *ngIf="stat.label === 'Total Revenue'" width="24" height="24" viewBox="0 0 24 24" fill="none"

@@ -30,10 +30,9 @@ export class DashboardComponent implements OnInit {
         if (res.success) {
           const s = res.data.stats;
           this.stats = [
-            { label: 'Total Revenue', value: '₹' + s.totalRevenue.toLocaleString(), change: (s.growthRate >= 0 ? '+' : '') + s.growthRate + '%', isPositive: s.growthRate >= 0, iconBg: 'bg-green-light' },
-            { label: 'Total Orders', value: s.totalOrders.toLocaleString(), change: '+8.2%', isPositive: true, iconBg: 'bg-brown-light' }, // Fixed value for now as growth doesn't track orders yet
-            { label: 'Active Customers', value: s.activeCustomers.toLocaleString(), change: '+5.1%', isPositive: true, iconBg: 'bg-gray-light' },
-            { label: 'Growth Rate', value: s.growthRate + '%', change: '+2.3%', isPositive: s.growthRate >= 0, iconBg: 'bg-blue-light' }
+            { label: 'Total Revenue', value: '₹' + s.totalRevenue.toLocaleString(), iconBg: 'bg-green-light' },
+            { label: 'Total Orders', value: s.totalOrders.toLocaleString(), iconBg: 'bg-brown-light' },
+            { label: 'Active Customers', value: s.activeCustomers.toLocaleString(), iconBg: 'bg-gray-light' }
           ];
 
           this.recentOrders = res.data.recentOrders.map((o: any) => ({
