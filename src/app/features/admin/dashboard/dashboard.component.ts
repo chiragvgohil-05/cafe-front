@@ -30,9 +30,8 @@ export class DashboardComponent implements OnInit {
         if (res.success) {
           const s = res.data.stats;
           this.stats = [
-            { label: 'Total Revenue', value: '₹' + s.totalRevenue.toLocaleString(), iconBg: 'bg-green-light' },
-            { label: 'Total Orders', value: s.totalOrders.toLocaleString(), iconBg: 'bg-brown-light' },
-            { label: 'Active Customers', value: s.activeCustomers.toLocaleString(), iconBg: 'bg-gray-light' }
+            { label: 'Active Customers', value: s.activeCustomers.toLocaleString(), iconBg: 'bg-gray-light' },
+            { label: 'Growth Rate', value: '12%', iconBg: 'bg-blue-light' } // Placeholder or dynamic if exists
           ];
 
           this.recentOrders = res.data.recentOrders.map((o: any) => ({

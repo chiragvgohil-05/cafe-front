@@ -56,10 +56,7 @@ export const routes: Routes = [
         path: 'users',
         loadComponent: () => import('./features/admin/users/users.component').then(m => m.UsersComponent)
       },
-      {
-        path: 'orders',
-        loadComponent: () => import('./features/admin/orders/orders.component').then(m => m.OrdersComponent)
-      },
+
       {
         path: 'categories',
         loadComponent: () => import('./features/admin/category/category.component').then(m => m.CategoryComponent)

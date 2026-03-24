@@ -7,6 +7,11 @@ export const authGuard: CanActivateFn = (route, state) => {
     const router = inject(Router);
 
     if (authService.isLoggedIn()) {
+        // Prevent admin from accessing user-side
+        if (authService.getRole() === 'admin') {
+            router.navigate(['/admin']);
+            return false;
+        }
         return true;
     }
 

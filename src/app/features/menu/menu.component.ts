@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MenuCategoryWithItems, MenuService, MenuItem } from '../../core/services/menu.service';
-import { OrderService } from '../../core/services/order.service';
+
 import { ToastService } from '../../core/services/toast.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
@@ -26,7 +26,6 @@ interface SelectedMenuItem extends LocalMenuItem {
 })
 export class Menu implements OnInit {
   private menuService = inject(MenuService);
-  private orderService = inject(OrderService);
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -39,62 +38,13 @@ export class Menu implements OnInit {
   loading = true;
   errorMessage = '';
   menuItems: LocalMenuItem[] = [];
-  selectedItems: SelectedMenuItem[] = [];
 
   // Flow State
-  activeReservation: any = null;
-  availableTables: Table[] = [];
-  selectedTable: Table | null = null;
-  showTableSelector = false;
   isLoggedIn = false;
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
     this.loadMenuItems();
-    if (this.isLoggedIn) {
-      this.checkActiveOrder();
-    }
-  }
-
-  private checkActiveOrder(): void {
-    this.orderService.getActiveOrder().subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          const activeOrder = res.data;
-          this.selectedTable = activeOrder.tableId;
-          this.toastService.info(`Current Table: #${this.selectedTable?.tableNumber}`);
-        } else {
-          this.checkActiveReservation();
-        }
-      },
-      error: () => this.checkActiveReservation()
-    });
-  }
-
-  private checkActiveReservation(): void {
-    this.reservationService.getActiveReservation().subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.activeReservation = res.data;
-          this.selectedTable = res.data.table;
-          this.toastService.success(`Welcome back! Linked to your Reservation on Table #${this.activeReservation.table.tableNumber}`);
-        } else {
-          this.loadAvailableTables();
-        }
-      },
-      error: () => {
-        this.loadAvailableTables();
-      }
-    });
-  }
-
-  private loadAvailableTables(): void {
-    this.tableService.listTables().subscribe({
-      next: (res) => {
-        // 🔥 Only show ACTIVE AND AVAILABLE tables
-        this.availableTables = res.data.filter(t => t.isActive && t.status === 'available');
-      }
-    });
   }
 
   private loadMenuItems(): void {
@@ -119,93 +69,6 @@ export class Menu implements OnInit {
 
   get filteredItems() {
     return this.menuItems.filter(item => item.isAvailable);
-  }
-
-  get selectedTotal(): number {
-    return this.selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  }
-
-  addToCart(item: LocalMenuItem): void {
-    const existing = this.selectedItems.find(i => i._id === item._id);
-    if (existing) {
-      existing.quantity++;
-    } else {
-      this.selectedItems.push({ ...item, quantity: 1 });
-    }
-  }
-
-  removeFromCart(itemId: string): void {
-    const index = this.selectedItems.findIndex(i => i._id === itemId);
-    if (index > -1) {
-      if (this.selectedItems[index].quantity > 1) {
-        this.selectedItems[index].quantity--;
-      } else {
-        this.selectedItems.splice(index, 1);
-      }
-    }
-  }
-
-  clearSelection(): void {
-    this.selectedItems = [];
-  }
-
-  initiateCheckout(): void {
-    if (!this.isLoggedIn) {
-      this.toastService.warning('Please login to place an order.');
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    if (this.selectedItems.length === 0) {
-      this.toastService.warning('Your cart is empty.');
-      return;
-    }
-
-    // Flow: Check if table is selected
-    if (!this.selectedTable) {
-      this.showTableSelector = true;
-      return;
-    }
-
-    this.processOrder();
-  }
-
-  selectTable(table: Table): void {
-    this.selectedTable = table;
-    this.showTableSelector = false;
-    this.toastService.info(`Selected Table #${table.tableNumber}`);
-    if (this.selectedItems.length > 0) {
-      this.processOrder();
-    }
-  }
-
-  private processOrder(): void {
-    const orderData = {
-      tableId: this.selectedTable?._id,
-      reservationId: this.activeReservation?._id,
-      items: this.selectedItems.map(item => ({
-        itemId: item._id,
-        quantity: item.quantity,
-        price: item.price
-      })),
-      totalAmount: this.selectedTotal
-    };
-
-    this.orderService.createOrder(orderData).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.toastService.success('Order placed successfully!');
-          this.clearSelection();
-          // Optionally navigate to a success page or orders page
-        } else {
-          this.toastService.error(res.message || 'Failed to place order.');
-        }
-      },
-      error: (err) => {
-        console.error('Order Error:', err);
-        this.toastService.error(err.error?.message || 'Error placing order.');
-      }
-    });
   }
 
   onImageError(event: Event): void {

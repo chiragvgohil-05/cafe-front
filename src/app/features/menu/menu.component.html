@@ -6,21 +6,7 @@
     </div>
   </div>
 
-  <!-- Active Session/Reservation Banner -->
-  <div class="active-banner fade-in" *ngIf="selectedTable">
-    <div class="container banner-inner">
-      <div class="banner-text">
-        <span class="banner-icon">✓</span>
-        <strong *ngIf="activeReservation">Linked to Reservation: Table #{{ selectedTable.tableNumber }}</strong>
-        <strong *ngIf="!activeReservation">You are sitting on Table #{{ selectedTable.tableNumber }}</strong>
-        <span class="banner-time" *ngIf="activeReservation">{{ activeReservation.date }} at {{
-          activeReservation.startTime }}</span>
-      </div>
-      <div class="banner-actions">
-        <div class="banner-tag">{{ activeReservation ? 'Reserved' : 'Sitting Now' }}</div>
-      </div>
-    </div>
-  </div>
+
 
   <div class="container main-content">
     <!-- Filters -->
@@ -44,13 +30,10 @@
       <!-- Menu Grid -->
       <div class="menu-grid" *ngIf="!loading && !errorMessage && filteredItems.length > 0">
         <div class="menu-card fade-in" *ngFor="let item of filteredItems">
-          <div class="card-img" (click)="addToCart(item)">
+          <div class="card-img">
             <img [src]="item.image || fallbackImage" [alt]="item.name" loading="lazy" (error)="onImageError($event)">
             <div class="category-badge">
               {{ item.category }}
-            </div>
-            <div class="hover-overlay">
-              <span>Quick Add +</span>
             </div>
           </div>
           <div class="card-content">
@@ -58,45 +41,8 @@
             <p class="description">{{ item.description }}</p>
             <div class="card-footer">
               <span class="price">₹{{ item.price | number:'1.2-2' }}</span>
-              <button class="btn-add" (click)="addToCart(item)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Live Order / Cart Preview (Internal View) -->
-      <div class="order-preview-panel" *ngIf="selectedItems.length > 0">
-        <div class="panel-header">
-          <h3>Your Selection</h3>
-          <button (click)="clearSelection()" class="btn-link">Clear All</button>
-        </div>
-
-        <div class="cart-items-list">
-          <div class="cart-item fade-in" *ngFor="let item of selectedItems">
-            <div class="item-info">
-              <span class="item-name">{{ item.name }}</span>
-              <span class="item-price">₹{{ item.price * item.quantity | number:'1.2-2' }}</span>
-            </div>
-            <div class="qty-controls">
-              <button class="qty-btn" (click)="removeFromCart(item._id)">-</button>
-              <span class="qty-val">{{ item.quantity }}</span>
-              <button class="qty-btn" (click)="addToCart(item)">+</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-footer">
-          <div class="total-line">
-            <span>Total Amount</span>
-            <strong>₹{{ selectedTotal | number:'1.2-2' }}</strong>
-          </div>
-          <button class="btn-checkout-primary" (click)="initiateCheckout()">
-            {{ selectedTable ? 'Place Live Order' : 'Select Table & Order' }}
-          </button>
         </div>
       </div>
     </div>
@@ -105,45 +51,6 @@
     <div class="empty-state" *ngIf="!loading && filteredItems.length === 0">
       <span class="icon">☕</span>
       <p>No items found in this section.</p>
-    </div>
-
-    <!-- Sticky Cart Summary (Fallback for Mobile) -->
-    <div class="cart-summary mobile-only" *ngIf="selectedItems.length > 0">
-      <div class="total-row">
-        <div class="cart-info">
-          <span>Items: {{ selectedItems.length }}</span>
-          <strong>₹{{ selectedTotal | number:'1.2-2' }}</strong>
-        </div>
-        <button class="btn-checkout" (click)="initiateCheckout()">
-          Place Order
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Table Selection Modal -->
-  <div class="modal-overlay fade-in" *ngIf="showTableSelector" (click)="showTableSelector = false">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Choose Your Table</h2>
-        <p>You need to select a table to place a live order.</p>
-      </div>
-
-      <div class="table-grid-modal">
-        <div class="table-item" *ngFor="let table of availableTables" (click)="selectTable(table)">
-          <div class="table-icon">🪑</div>
-          <div class="table-details">
-            <span class="table-num">Table #{{ table.tableNumber }}</span>
-            <span class="table-type">{{ table.type }} • {{ table.capacity }} Guests</span>
-          </div>
-          <div class="selection-arrow">→</div>
-        </div>
-      </div>
-
-      <button class="btn-close-modal" (click)="showTableSelector = false">Back to Menu</button>
     </div>
   </div>
 </section>

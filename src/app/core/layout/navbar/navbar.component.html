@@ -20,8 +20,7 @@
                 <a routerLink="/register" class="nav-link" routerLinkActive="active" (click)="closeMenu()">Register</a>
             </ng-container>
             <ng-container *ngIf="authService.isLoggedIn()">
-                <a *ngIf="authService.getRole() === 'admin'" routerLink="/admin" class="nav-link"
-                    routerLinkActive="active" (click)="closeMenu()">Admin</a>
+
 
                 <div class="user-dropdown-container">
                     <div class="user-trigger" (click)="toggleUserDropdown()">

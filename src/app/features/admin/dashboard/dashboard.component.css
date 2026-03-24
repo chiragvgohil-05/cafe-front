@@ -64,10 +64,21 @@
 }
 
 /* Colors for icon backgrounds */
-.bg-green-light { background-color: #f0fff4; }
-.bg-brown-light { background-color: #fffaf0; }
-.bg-gray-light { background-color: #f7fafc; }
-.bg-blue-light { background-color: #ebf8ff; }
+.bg-green-light {
+    background-color: #f0fff4;
+}
+
+.bg-brown-light {
+    background-color: #fffaf0;
+}
+
+.bg-gray-light {
+    background-color: #f7fafc;
+}
+
+.bg-blue-light {
+    background-color: #ebf8ff;
+}
 
 /* Dashboard Grid */
 .dashboard-grid {
@@ -167,9 +178,20 @@
     letter-spacing: 0.5px;
 }
 
-.status-completed { background: #f0fff4; color: #38a169; }
-.status-preparing { background: #fffaf0; color: #dd6b20; }
-.status-pending { background: #ebf8ff; color: #3182ce; }
+.status-completed {
+    background: #f0fff4;
+    color: #38a169;
+}
+
+.status-preparing {
+    background: #fffaf0;
+    color: #dd6b20;
+}
+
+.status-pending {
+    background: #ebf8ff;
+    color: #3182ce;
+}
 
 /* Popular Items List */
 .popular-list {
