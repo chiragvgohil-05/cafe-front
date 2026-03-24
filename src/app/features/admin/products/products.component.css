@@ -281,6 +281,14 @@ tr:hover td {
     flex-grow: 1;
 }
 
+.modal-content.premium form {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    flex-grow: 1;
+}
+
 /* Premium Scrollbar for Modal Body */
 .modal-body::-webkit-scrollbar {
     width: 6px;
@@ -344,9 +352,7 @@ tr:hover td {
     color: #000;
 }
 
-.modal-body {
-    padding: 16px 40px 32px;
-}
+/* Removed redundant .modal-body definition */
 
 .form-grid {
     display: grid;
@@ -755,4 +761,83 @@ textarea:focus {
 .btn-danger-premium:hover {
     background: #E63939;
     box-shadow: 0 8px 16px rgba(255, 77, 77, 0.2);
+}
+/* Responsive Queries for Modal */
+@media screen and (max-width: 768px) {
+    .modal-content.premium {
+        width: 95% !important;
+        max-height: 98vh !important;
+        border-radius: 16px;
+    }
+
+    .modal-header {
+        padding: 20px 24px 12px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 12px 24px 24px;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .image-upload-area {
+        height: 180px;
+    }
+
+    .modal-footer-fancy {
+        padding: 16px 24px;
+        flex-direction: column-reverse; /* Stack buttons, submit always on top */
+        gap: 12px;
+    }
+
+    .modal-footer-fancy button {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+
+    .btn-cancel-fancy {
+        justify-content: center;
+        margin: 0;
+    }
+
+    .btn-cancel-fancy:hover {
+        transform: translateY(2px);
+    }
+    
+    .category-grid-selector {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        padding: 10px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .header-right {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .search-bar {
+        width: 100%;
+    }
+
+    .btn-primary {
+        justify-content: center;
+        width: 100%;
+    }
 }
