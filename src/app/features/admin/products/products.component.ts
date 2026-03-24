@@ -15,11 +15,18 @@ export class ProductsComponent implements OnInit {
   private menuService = inject(MenuService);
   private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
+  Math = Math;
 
   searchTerm: string = '';
   products: any[] = [];
   categories: Category[] = [];
   currentCategory: string = 'All';
+
+  // Pagination
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalItems: number = 0;
+  totalPages: number = 0;
 
   // Modal states
   showProductModal = false;
@@ -49,17 +56,29 @@ export class ProductsComponent implements OnInit {
     this.menuService.getCategories(true).subscribe(res => {
       if (res.success) this.categories = res.data;
     });
-    this.menuService.getMenuItems().subscribe(res => {
+    this.fetchProducts();
+  }
+
+  fetchProducts() {
+    this.menuService.getMenuItemsAdmin(this.currentPage, this.pageSize, this.searchTerm, this.currentCategory).subscribe(res => {
       if (res.success) {
-        this.products = res.data.flatMap((cat: any) =>
-          cat.items.map((item: any) => ({
-            ...item,
-            categoryId: cat._id,
-            categoryName: cat.name
-          }))
-        );
+        this.products = res.data.items.map((item: any) => ({
+          ...item,
+          categoryName: item.categoryId?.name || 'N/A',
+          categoryId: item.categoryId?._id
+        }));
+        this.totalItems = res.data.pagination.totalItems;
+        this.totalPages = res.data.pagination.totalPages;
+        this.currentPage = res.data.pagination.currentPage;
       }
     });
+  }
+
+  onPageChange(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.fetchProducts();
+    }
   }
 
   get filteredProducts() {
@@ -73,6 +92,13 @@ export class ProductsComponent implements OnInit {
 
   setCategory(categoryId: string) {
     this.currentCategory = categoryId;
+    this.currentPage = 1;
+    this.fetchProducts();
+  }
+
+  onSearch() {
+    this.currentPage = 1;
+    this.fetchProducts();
   }
 
   openAddModal() {
@@ -139,7 +165,7 @@ export class ProductsComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.showProductModal = false;
-            this.loadData();
+            this.fetchProducts();
             this.toastService.success('Product updated successfully');
           } else {
             this.toastService.error(res?.message || 'Failed to update product');
@@ -157,7 +183,7 @@ export class ProductsComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.showProductModal = false;
-            this.loadData();
+            this.fetchProducts();
             this.toastService.success('Product created successfully');
           } else {
             this.toastService.error(res?.message || 'Failed to create product');
@@ -179,7 +205,7 @@ export class ProductsComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.showDeleteModal = false;
-            this.loadData();
+            this.fetchProducts();
             this.toastService.success('Product deleted successfully');
           } else {
             this.toastService.error(res?.message || 'Failed to delete product');

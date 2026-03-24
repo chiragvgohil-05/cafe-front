@@ -13,7 +13,7 @@
                     <path d="M21 21L16.65 16.65" stroke="#6c757d" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" />
                 </svg>
-                <input type="text" [(ngModel)]="searchTerm" placeholder="Search products...">
+                <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="Search products...">
             </div>
             <button class="btn-primary" (click)="openAddModal()">
                 <span class="btn-icon">+</span> Add Product
@@ -42,7 +42,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let product of filteredProducts">
+                <tr *ngFor="let product of products">
                     <td class="product-cell">
                         <div class="product-icon">
                             <img *ngIf="product.image" [src]="product.image" [alt]="product.name"
@@ -96,7 +96,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr *ngIf="filteredProducts.length === 0">
+                <tr *ngIf="products.length === 0">
                     <td colspan="5" class="empty-state">
                         <div class="empty-content">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -110,6 +110,32 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="totalItems > 0">
+        <div class="pagination-info">
+            Showing <span>{{ (currentPage - 1) * pageSize + 1 }}-{{ Math.min(currentPage * pageSize, totalItems) }}</span>
+            of <span>{{ totalItems }}</span> products
+        </div>
+        <div class="pagination-controls">
+            <button class="page-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <div class="page-numbers">
+                <button *ngFor="let p of [].constructor(totalPages); let i = index" class="page-num"
+                    [class.active]="currentPage === (i + 1)" (click)="onPageChange(i + 1)">
+                    {{ i + 1 }}
+                </button>
+            </div>
+            <button class="page-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <!-- Product Modal (Add/Edit) -->

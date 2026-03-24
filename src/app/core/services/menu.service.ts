@@ -52,6 +52,10 @@ export class MenuService {
         return this.http.get<MenuItemsResponse>(`${this.apiUrl}/menu-list`);
     }
 
+    getMenuItemsAdmin(page: number = 1, limit: number = 10, search: string = '', categoryId: string = 'All'): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/menu-items-admin?page=${page}&limit=${limit}&search=${search}&categoryId=${categoryId}`);
+    }
+
     createMenuItem(formData: FormData): Observable<any> {
         return this.http.post(`${this.apiUrl}/menu`, formData);
     }
