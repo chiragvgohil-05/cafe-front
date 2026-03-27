@@ -28,6 +28,7 @@ export class Reservation {
 
   currentStep = 1;
   bookingForm: FormGroup;
+  minDate: string = new Date().toISOString().split('T')[0];
 
   // State
   selectedTable: Table | null = null;

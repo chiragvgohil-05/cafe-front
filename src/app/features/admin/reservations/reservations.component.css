@@ -48,7 +48,7 @@
 /* Stats Row */
 .stats-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: var(--spacing-md);
 }
 
@@ -129,6 +129,27 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 0.95rem;
+}
+
+.checkbox-group {
+    margin-bottom: 8px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #444;
+    user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin: 0;
 }
 
 .btn-reset {

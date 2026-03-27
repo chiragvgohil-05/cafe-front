@@ -15,7 +15,7 @@ export class DashboardComponent implements OnInit {
   private toastService = inject(ToastService);
 
   stats: any[] = [];
-  recentOrders: any[] = [];
+  upcomingReservations: any[] = [];
   popularItems: any[] = [];
   loading = true;
 
@@ -30,18 +30,12 @@ export class DashboardComponent implements OnInit {
         if (res.success) {
           const s = res.data.stats;
           this.stats = [
-            { label: 'Active Customers', value: s.activeCustomers.toLocaleString(), iconBg: 'bg-gray-light' },
-            { label: 'Growth Rate', value: '12%', iconBg: 'bg-blue-light' } // Placeholder or dynamic if exists
+            { label: 'Total Revenue', value: '₹' + s.totalRevenue.toLocaleString(), iconBg: 'bg-green-light', icon: 'revenue' },
+            { label: 'Active Customers', value: s.activeCustomers.toLocaleString(), iconBg: 'bg-orange-light', icon: 'customers' },
+            { label: 'Today Reservations', value: s.todayReservations.toLocaleString(), iconBg: 'bg-purple-light', icon: 'reservations' }
           ];
 
-          this.recentOrders = res.data.recentOrders.map((o: any) => ({
-            id: '#' + o._id.substring(o._id.length - 4),
-            customer: 'Guest', // Usually linked to user, for now simple placeholder
-            items: o.items.length + ' items',
-            total: '₹' + o.totalAmount,
-            status: o.orderStatus,
-            time: new Date(o.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }));
+          this.upcomingReservations = res.data.upcomingReservations || [];
 
           this.popularItems = res.data.popularItems.map((p: any) => ({
             name: p.name,

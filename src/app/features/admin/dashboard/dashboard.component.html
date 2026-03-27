@@ -12,30 +12,64 @@
                 <div class="stat-value">{{ stat.value }}</div>
             </div>
             <div class="stat-icon" [ngClass]="stat.iconBg">
-                <svg *ngIf="stat.label === 'Active Customers'" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="#6c757d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg *ngIf="stat.icon === 'customers'" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#ff9800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
-                <svg *ngIf="stat.label === 'Growth Rate'" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                    <polyline points="17 6 23 6 23 12"></polyline>
+                <svg *ngIf="stat.icon === 'revenue'" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <svg *ngIf="stat.icon === 'reservations'" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#6f42c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
             </div>
         </div>
     </div>
 
     <div class="dashboard-grid">
-        <!-- Dashboard content for other functionalities or placeholder for reservations -->
+
+        <!-- Upcoming Reservations -->
         <div class="grid-card">
             <div class="card-header">
-                <h2>Reservation Management</h2>
-                <button class="view-all" routerLink="/admin/reservations">Go to Reservations</button>
+                <h2>Upcoming Reservations</h2>
+                <button class="view-all" routerLink="/admin/reservations">View All</button>
             </div>
-            <p style="padding: 20px;">Use the sidebar to manage reservations and view table availability.</p>
+            <div class="table-responsive">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Guest</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                            <th>Table</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let res of upcomingReservations">
+                            <td>{{ res.name }}</td>
+                            <td>{{ res.time }}</td>
+                            <td>{{ res.date | date:'shortDate' }}</td>
+                            <td>T{{ res.table }}</td>
+                            <td>
+                                <span class="status-badge" [ngClass]="'status-' + res.status">
+                                    {{ res.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr *ngIf="upcomingReservations.length === 0">
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">No upcoming reservations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

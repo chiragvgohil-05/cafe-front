@@ -25,6 +25,10 @@
             <span class="stat-label">Total</span>
             <div class="stat-value">{{ stats.total }}</div>
         </div>
+        <div class="stat-box" (click)="onStatusFilterChange('pending')" [class.active]="statusFilter === 'pending'">
+            <span class="stat-label">Pending</span>
+            <div class="stat-value text-orange">{{ stats.pending }}</div>
+        </div>
         <div class="stat-box" (click)="onStatusFilterChange('confirmed')" [class.active]="statusFilter === 'confirmed'">
             <span class="stat-label">Confirmed</span>
             <div class="stat-value text-green">{{ stats.confirmed }}</div>
@@ -44,6 +48,12 @@
         <div class="filter-group">
             <label>Filter by Date</label>
             <input type="date" [(ngModel)]="dateFilter" (ngModelChange)="onDateFilterChange()">
+        </div>
+        <div class="filter-group checkbox-group">
+            <label class="checkbox-container">
+                <input type="checkbox" [(ngModel)]="showPastReservations" (change)="applyFilters()">
+                Show Past Reservations
+            </label>
         </div>
         <button class="btn-reset" *ngIf="dateFilter || statusFilter !== 'all'"
             (click)="statusFilter = 'all'; dateFilter = ''; applyFilters()">

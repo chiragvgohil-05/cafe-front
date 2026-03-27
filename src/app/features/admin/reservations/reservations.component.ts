@@ -53,10 +53,13 @@ export class ReservationsComponent implements OnInit {
     // Stats
     stats = {
         total: 0,
+        pending: 0,
         confirmed: 0,
         completed: 0,
         cancelled: 0
     };
+
+    showPastReservations = false;
 
     // Modals
     showDeleteModal = false;
@@ -89,12 +92,15 @@ export class ReservationsComponent implements OnInit {
 
     calculateStats() {
         this.stats.total = this.reservations.length;
+        this.stats.pending = this.reservations.filter(r => r.status === 'pending').length;
         this.stats.confirmed = this.reservations.filter(r => r.status === 'confirmed').length;
         this.stats.completed = this.reservations.filter(r => r.status === 'completed').length;
         this.stats.cancelled = this.reservations.filter(r => r.status === 'cancelled').length;
     }
 
     applyFilters() {
+        const today = new Date().toISOString().split('T')[0];
+        
         this.filteredReservations = this.reservations.filter(res => {
             const searchLower = this.searchTerm.toLowerCase();
             const matchesSearch = !this.searchTerm ||
@@ -105,9 +111,13 @@ export class ReservationsComponent implements OnInit {
 
             const matchesStatus = this.statusFilter === 'all' || res.status === this.statusFilter;
 
-            const matchesDate = !this.dateFilter || res.date === this.dateFilter;
+            const matchesDateFilter = !this.dateFilter || res.date === this.dateFilter;
 
-            return matchesSearch && matchesStatus && matchesDate;
+            // Date visibility logic: hide past dates if showPastReservations is false AND no specific date filter is set
+            const isPast = res.date < today;
+            const matchesPastFilter = this.showPastReservations || !isPast || !!this.dateFilter;
+
+            return matchesSearch && matchesStatus && matchesDateFilter && matchesPastFilter;
         });
     }
 
